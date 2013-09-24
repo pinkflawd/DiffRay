@@ -7,30 +7,44 @@ Created on 06.09.2013
 import ConfigParser
 import pymssql
 import os.path
+from Exceptions import DatabaseError, FileError
+import logging.config
 
 class MSSqlDB(object):
-    '''
-    classdocs
-    '''
+
+    try:
+        logging.config.fileConfig(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..','..', 'conf', 'logger.conf'))
+        log = logging.getLogger('MSSqlDB')
+    except:
+        # here could go some configuration of a default logger -- me too lazy
+        print "Error, logger.conf not found or broken. Check on http://docs.python.org/2/howto/logging.html what to do."
+        exit(1)
 
 
     def __init__(self):
         
-        # TODO sanitize & throw around exceptions
-        
-        conf = ConfigParser.ConfigParser()
-        conf.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'conf', 'static.conf'))
-        
-        dbhost = conf.get('Database', 'dbhost')
-        dbuser = conf.get('Database', 'dbuser')
-        dbpassword = conf.get('Database', 'dbpassword')
-        dbname = conf.get('Database', 'dbname')
-        
-        self.localdb = pymssql.connect(host=dbhost, user=dbuser, password=dbpassword, database=dbname, as_dict=True)  # @UndefinedVariable
+        try:
+            conf = ConfigParser.ConfigParser()
+            conf.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'conf', 'static.conf'))
+        except:
+            raise FileError, "Static.conf cant be accessed."
+        else:
+            dbhost = conf.get('Database', 'dbhost')
+            dbuser = conf.get('Database', 'dbuser')
+            dbpassword = conf.get('Database', 'dbpassword')
+            dbname = conf.get('Database', 'dbname')
+            
+        try:
+            self.localdb = pymssql.connect(host=dbhost, user=dbuser, password=dbpassword, database=dbname, as_dict=True)  # @UndefinedVariable
+        except:
+            raise DatabaseError, "Connection to DB cant be established."
 
     
     def __del__(self):
-        self.localdb.close()
+        try:
+            self.localdb.close()
+        except:
+            pass
         
         
     ###########################
@@ -42,32 +56,51 @@ class MSSqlDB(object):
     
     
     def select(self, select_string):
-        cursor = self.localdb.cursor()
-        cursor.execute(select_string)
-        return cursor
-    
+        try:
+            cursor = self.localdb.cursor()
+            cursor.execute(select_string)
+        except:
+            raise DatabaseError, "An Error occurred when executing a select."
+        else:
+            return cursor
+        
     def insert(self, insert_string):
-        cursor = self.localdb.cursor()
-        cursor.execute(insert_string)
-        self.localdb.commit()
+        try:
+            cursor = self.localdb.cursor()
+            cursor.execute(insert_string)
+        except:
+            raise DatabaseError, "An Error occurred when executing an insert."
+        else:
+            self.localdb.commit()
         
         
     def insert_many(self, insert_string, inserts):
-        cursor = self.localdb.cursor()
-        for thing in inserts:
-            cursor.execute(insert_string, thing)
-        self.localdb.commit()
-                
+        try:
+            cursor = self.localdb.cursor()
+            for thing in inserts:
+                cursor.execute(insert_string, thing)
+        except:
+            raise DatabaseError, "An Error occurred when executing an insert-many."
+        else:
+            self.localdb.commit()
         
     def delete(self, delete_string):
-        cursor = self.localdb.cursor()
-        cursor.execute(delete_string)
-        self.localdb.commit()
+        try:
+            cursor = self.localdb.cursor()
+            cursor.execute(delete_string)
+        except:
+            raise DatabaseError, "An Error occurred when executing a delete."
+        else:
+            self.localdb.commit()
         
     def update(self, update_string):
-        cursor = self.localdb.cursor()
-        cursor.execute(update_string)
-        self.localdb.commit()
+        try:
+            cursor = self.localdb.cursor()
+            cursor.execute(update_string)
+        except:
+            raise DatabaseError, "An Error occurred when executing a delete."
+        else:
+            self.localdb.commit()
 
 
     ###########################
@@ -131,9 +164,9 @@ class MSSqlDB(object):
         if libid == 0:
             insert_string = "insert into [Poc].[dbo].[t_library] (libmd5, libname, os) values (0x%s,'%s', '%s')" % (filemd5, filename, os)
             self.insert(insert_string)
-            print "LOG MSSqlDB - created library %s with md5 %s" %(filename, filemd5)
+            self.log.info("Library %s with md5 %s created" %(filename, filemd5))
         else:
-            print "LOG MSSqlDB - library with id %s already exists" % filemd5
+            self.log.info("Library with id %s already exists" % filemd5)
                 
                 
     def insert_function(self, libid, funcname, linecount):

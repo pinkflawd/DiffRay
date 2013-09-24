@@ -8,17 +8,23 @@ import Database.MSSqlDB
 import Function
 import hashlib
 import re
+import logging.config
+import os
 
 from Exceptions import ParameterError, FileError
 
 class Library(object):
-    '''
-    classdocs
-    '''
+    
+    try:
+        logging.config.fileConfig(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..','..', 'conf', 'logger.conf'))
+        log = logging.getLogger('Library')
+    except:
+        # here could go some configuration of a default logger -- me too lazy
+        print "Error, logger.conf not found or broken. Check on http://docs.python.org/2/howto/logging.html what to do."
+        exit(1)
 
 
     def __init__(self, path, os):
-        
         
         if len(path) < 300:
             self.path = path
@@ -35,11 +41,11 @@ class Library(object):
             self.file = open(self.path)
         except IOError:
             raise FileError, "Cant open given file for parsing! IOError."
-        except StandardError:
+        except:
             raise FileError, "Cant open given file for parsing! Unknown Error."
             
         else:    
-            print "LOG Library - parsing %s for %s" % (self.path, self.os)
+            self.log.info("parsing %s for %s" % (self.path, self.os))
             
             data = self.file.read()
             self.filemd5 = hashlib.md5(data).hexdigest()
@@ -62,47 +68,48 @@ class Library(object):
         #func_offset = None
         function = None
         
-        self.file = open(self.path) # file handle doesnt survive the method switch?!
+        #TODO try
+        try:
+            self.file = open(self.path) # file handle doesnt survive the method switch?!
+        except:
+            raise FileError, "Can't open file to parse. At parse_cfile."
         
-        signatures = self.db.select_signatures()
-        
-        for line in self.file:
-            if f_off.search(line) and not semico.search(line):
-                
-                if function is not None:
-                    # update linecount to database
-                    function.set_linecount(linecount)
-               
-                # TODO write found signatures to database - execute many!!
-                
-                # create new function (object) with linecount 0
-                function = Function.Function(self.id, line.rstrip(), 0)
-                linecount = 0
-                
-            elif function is not None and not comment.search(line):                      #inside a function and not a comment line
-  
-                for sig in signatures:
-                    sigscan = re.compile(sig)
-                    if sigscan.search(line):
-                        function.signature_found(function.libid,function.id,sig,linecount+1)
-                        #print "Line: %i Sig: %s" % (linecount+1, sig)
-                        #print "Where: %s" % function.funcname
-                        #print "In: %s" % line
-                        
-                
-                # every line: count++
-                linecount = linecount+1
-                
-            else:
-                pass
+        else:
             
-        # dont forget last function ;)
-        function.set_linecount(linecount)
-
+            signatures = self.db.select_signatures()
+            self.log.info("Parsing...... pls wait")
+            
+            for line in self.file:
+                if f_off.search(line) and not semico.search(line):
+                    
+                    if function is not None:
+                        # update linecount to database
+                        function.set_linecount(linecount)
+                   
+                    # create new function (object) with linecount 0
+                    function = Function.Function(self.id, line.rstrip(), 0)
+                    linecount = 0
+                    
+                elif function is not None and not comment.search(line):                      #inside a function and not a comment line
+      
+                    for sig in signatures:
+                        sigscan = re.compile(sig)
+                        if sigscan.search(line):
+                            function.signature_found(function.libid,function.id,sig,linecount+1)
+                                            
+                    # every line: count++
+                    linecount = linecount+1
+                    
+                else:
+                    pass
+            
+                    # dont forget last function ;)
+            function.set_linecount(linecount)
+ 
         
     def flush_me(self):
         self.db.flush_library(self.id)
-        print "LOG Library - Library %s with id %s successfully flushed" % (self.path, self.filemd5)
+        self.log.info("Library %s with id %s flushed" % (self.path, self.filemd5))
         
 
         
