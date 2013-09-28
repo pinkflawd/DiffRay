@@ -10,6 +10,8 @@ import Database.MSSqlDB
 import os.path
 import sys
 import logging.config
+import re
+
 
 def main():
     
@@ -25,10 +27,11 @@ def main():
     parser = OptionParser()
        
     ### Parsing
+    parser.add_option("-d", "--dirparse", dest="directory", help="The directory which contains EITHER c or lst files for ONE os! Needs OS and type option.")
     parser.add_option("-p", "--parse", dest="filename", help="The file to parse, needs the OS option and the type option too")
     parser.add_option("-o", "--os", dest="os", help="OS the Library belongs to, Win7 or Win8")
     #TODO parse lst
-    parser.add_option("-t", "--type", dest="type", help="Type of file to parse - .c or .lst")
+    parser.add_option("-t", "--type", dest="ftype", help="Type of file to parse - .c or .lst")
     
     ### Maintenance
     parser.add_option("-f", "--flushall", action="store_true", dest="flush", help="Flush the Database Scheme")
@@ -44,23 +47,29 @@ def main():
     
     ### OPTION parse ###
  
-    if options.filename is not None and options.os is not None:
+    if options.filename is not None and options.os is not None and options.ftype is not None:
         
         try:
             
-            lib = Parsing.Library.Library(options.filename, options.os)
+            lib = Parsing.Library.Library(options.filename, options.os, options.ftype)
             
             # if lib exists - flush functions
             lib.flush_me()
-            lib.parse_cfile()
+            
+            if options.ftype == "c" or options.ftype == "C":
+                lib.parse_cfile()
+            elif options.ftype == "lst" or options.ftype == "LST":
+                lib.parse_lstfile()
+            else:
+                log.error("Wrong file type! Either c or C or lst or LST, pleeease dont mix caps with small letters, dont have all day for op parsing ;)")
+            
             log.info("Finished Parsing")
 
         except:
-            print sys.exc_info()[1]
-            #log.error("An Error occurred: ", sys.exc_info()[1])
+            log.error("Something went wrong when parsing a library: %s" % (sys.exc_info()[1]))
         
         
-    ### OPTION parse incomplete ###
+    ### OPTION recreate or flush incomplete ###
     
     elif (options.flush == True or options.createall == True) and options.updatesigs is None:
         log.error("Options flushall and create-scheme need option --update-sigs or -u !!")
@@ -85,19 +94,18 @@ def main():
             except IOError:
                 log.error("Signatures.conf can't be read, check conf directory")
             except:
-                log.error("An error occurred: ", sys.exc_info[1])
+                log.error("Something went wrong when reading signature file: ", sys.exc_info[1])
             else:  
                 for line in sigfile:
-                    
-                    # TODO sanitize line
-                    signatures.append(line.rstrip())
+                    #sanitizing the signatures
+                    sig = re.sub('\'','', line.rstrip(),0)
+                    signatures.append(sig)
                 db.insert_signatures(signatures)
                 sigfile.close()
         
         except:
-            log.error("An Error occurred: ", sys.exc_info()[1])
+            log.error("Something went wrong when updating the signatures in DB: ", sys.exc_info()[1])
         
-
     else:
         log.error("Wrong Arguments - type -h or --help for Info")
         

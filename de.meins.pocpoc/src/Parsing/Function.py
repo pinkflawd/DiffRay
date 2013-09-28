@@ -6,6 +6,7 @@ Created on 12.09.2013
 
 import Database.MSSqlDB
 from Exceptions import ParameterError
+import re
 
 
 class Function(object):
@@ -19,10 +20,11 @@ class Function(object):
         #if u wish so, check libid if integer. but basically, not necessary     
         self.libid = libid
         
-        if len(funcname) < 499:
-            self.funcname = funcname
+        if len(funcname) < 999:
+            sanifname = re.sub('\'','', funcname,0)
+            self.funcname = sanifname
         else:
-            raise ParameterError, "Funcname for function object is too long, max 499 chars."
+            raise ParameterError, "A funcname for function object is too long, max 999 chars."
         
         if linecount < 2147483647: 
             self.linecount = linecount
@@ -41,3 +43,4 @@ class Function(object):
     
     def signature_found(self, libid, funcid, sigpattern, line_offset):
         self.db.insert_hit(libid, funcid, sigpattern, line_offset)
+

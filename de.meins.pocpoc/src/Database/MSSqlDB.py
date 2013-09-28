@@ -9,6 +9,7 @@ import pymssql
 import os.path
 from Exceptions import DatabaseError, FileError
 import logging.config
+import re
 
 class MSSqlDB(object):
 
@@ -65,7 +66,9 @@ class MSSqlDB(object):
             return cursor
         
     def insert(self, insert_string):
+        
         try:
+            #print insert_string
             cursor = self.localdb.cursor()
             cursor.execute(insert_string)
         except:
@@ -157,14 +160,14 @@ class MSSqlDB(object):
         self.delete(delete_string)
         
     
-    def insert_library(self, filemd5, filename, os):
+    def insert_library(self, filemd5, filename, os, ftype):
         
         select_string = "select id from [Poc].[dbo].[t_library] where libmd5 = 0x%s" % filemd5
         libid = self.select_id(select_string)
         if libid == 0:
-            insert_string = "insert into [Poc].[dbo].[t_library] (libmd5, libname, os) values (0x%s,'%s', '%s')" % (filemd5, filename, os)
+            insert_string = "insert into [Poc].[dbo].[t_library] (libmd5, libname, os, filetype) values (0x%s,'%s', '%s', '%s')" % (filemd5, filename, os, ftype)
             self.insert(insert_string)
-            self.log.info("Library %s with md5 %s created" %(filename, filemd5))
+            self.log.info("Library %s with id %s created" %(filename, filemd5))
         else:
             self.log.info("Library with id %s already exists" % filemd5)
                 
@@ -204,14 +207,15 @@ class MSSqlDB(object):
                         id int identity(1,1) primary key not null,
                         libmd5 [binary](16) not null,
                         libname    varchar(300) not null,
-                        os        varchar(4)
+                        os        varchar(4),
+                        filetype    varchar(3)
                         )"""
         self.insert(create_string)
 
         create_string = """create table t_function (
                         id int identity(1,1) primary key not null,
                         libid int not null,
-                        funcname varchar(500),
+                        funcname varchar(1000),
                         linecount int
                         )"""
         self.insert(create_string)
@@ -250,5 +254,6 @@ class MSSqlDB(object):
 
 
         print "LOG MSSqlDB - Database recreated"
+        
 
 

@@ -24,10 +24,11 @@ class Library(object):
         exit(1)
 
 
-    def __init__(self, path, os):
+    def __init__(self, path, os, ftype):
         
         if len(path) < 300:
-            self.path = path
+            sanipath = re.sub('\'','', path,0)
+            self.path = sanipath
         else:
             raise ParameterError, "Path Parameter too long! max. 299" 
             
@@ -35,7 +36,11 @@ class Library(object):
             self.os = os
         else:
             raise ParameterError, "OS Parameter too long! Expects Win7 or Win8, max. 4"
- 
+        
+        if len(ftype) < 4:
+            self.ftype = ftype
+        else:
+            raise ParameterError, "Type can be c or C or lst or LST, literally nothing else."
 
         try:
             self.file = open(self.path)
@@ -51,7 +56,7 @@ class Library(object):
             self.filemd5 = hashlib.md5(data).hexdigest()
             
             self.db = Database.MSSqlDB.MSSqlDB()
-            self.db.insert_library(self.filemd5,self.path,self.os)
+            self.db.insert_library(self.filemd5,self.path,self.os,self.ftype)
             
             select_string = "select id from t_library where libmd5 = 0x%s" % self.filemd5
             self.id = self.db.select_id(select_string)
@@ -65,10 +70,8 @@ class Library(object):
         comment = re.compile('^[\/\/|#]')
 
         linecount = 0
-        #func_offset = None
         function = None
         
-        #TODO try
         try:
             self.file = open(self.path) # file handle doesnt survive the method switch?!
         except:
@@ -106,11 +109,58 @@ class Library(object):
                     # dont forget last function ;)
             function.set_linecount(linecount)
  
+    def parse_lstfile(self):
+        # Regexes to scan for function offsets
+        f_off = re.compile('^\.[a-zA-Z]+:[0-9a-fA-F]+.+(stdcall|cdecl|thiscall|fastcall|userpurge|usercall)')   
+        f_off2 = re.compile('^\.[a-zA-Z]+:[0-9a-fA-F]+ sub_')
+        f_off3 = re.compile('START OF FUNCTION CHUNK')
+        endp = re.compile('endp')
+        
+        linecount = 0
+        function = None
+        
+        try:
+            self.file = open(self.path)
+        except:
+            raise FileError, "Can't open file to parse. At parse_lstfile."
+        
+        else:
+            
+            signatures = self.db.select_signatures()
+            self.log.info("Parsing...... pls wait")
+            
+            for line in self.file:
+                #if (f_off.search(line) or (f_off2.search(line) and not endp.search(line)) or f_off3.search(line)):
+                if (f_off.search(line) or f_off3.search(line)):
+                
+                    if function is not None:
+                        # update linecount to database
+                        function.set_linecount(linecount)
+                   
+                    # create new function (object) with linecount 0
+                    function = Function.Function(self.id, line.rstrip(), 0)
+                    linecount = 0
+                    
+                elif function is not None:                      #inside a function and not a comment line
+      
+                    for sig in signatures:
+                        regex = "^\.[a-zA-Z]+:[0-9a-fA-F]+\s+call.*"
+                        regex += sig
+                        sigscan = re.compile(regex)
+                        if sigscan.search(line):
+                            function.signature_found(function.libid,function.id,sig,linecount+1)
+                                            
+                    # every line: count++
+                    linecount = linecount+1
+                    
+                else:
+                    pass
+            
+                    # dont forget last function ;)
+            function.set_linecount(linecount)
+        
         
     def flush_me(self):
         self.db.flush_library(self.id)
         self.log.info("Library %s with id %s flushed" % (self.path, self.filemd5))
-        
-
-        
         
