@@ -9,7 +9,7 @@ import pymssql
 import os.path
 from Exceptions import DatabaseError, FileError
 import logging.config
-import re
+
 
 class MSSqlDB(object):
 
@@ -146,7 +146,7 @@ class MSSqlDB(object):
                       drop table t_signature"""
         self.delete(drop_string)
         
-        print "LOG MSSqlDB - Database flushed"
+        self.log.info("Database flushed")
     
     def flush_library(self, libid):
         delete_string = "delete from [Poc].[dbo].[t_hit] where libid = %s" % libid
@@ -182,7 +182,7 @@ class MSSqlDB(object):
         for sig in signatures:
             insert_string = "insert into [Poc].[dbo].[t_signature] (sigpattern) values ('%s')" % sig
             self.insert(insert_string)
-        print "LOG MSSqlDB - Signatures inserted/updated"
+        self.log.info("Signatures inserted/updated")
         
         
     def insert_hit(self, libid, funcid, sigpattern, line_offset):
@@ -253,7 +253,7 @@ class MSSqlDB(object):
         self.insert(create_string)
 
 
-        print "LOG MSSqlDB - Database recreated"
+        self.log.info("Database recreated")
         
 
 

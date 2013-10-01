@@ -32,9 +32,10 @@ class Function(object):
             raise ParameterError, "Linecount exceeds int range - weiiird should never happen."
         
         # might throw exception - theres no throws keyword :/
-        self.db = Database.MSSqlDB.MSSqlDB()
+        # self.db = Database.MSSqlDB.MSSqlDB()
+        self.db = Database.SQLiteDB.SQLiteDB()
         self.db.insert_function(self.libid,self.funcname,self.linecount)
-        select_string = "select id from [Poc].[dbo].[t_function] where libid = %i and funcname = '%s' and linecount = %i" % (self.libid,self.funcname,self.linecount)
+        select_string = "select id from t_function where libid = %i and funcname = '%s' and linecount = %i" % (self.libid,self.funcname,self.linecount)
         self.id = self.db.select_id(select_string)
         
         

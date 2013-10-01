@@ -44,8 +44,6 @@ class Library(object):
 
         try:
             self.file = open(self.path)
-        except IOError:
-            raise FileError, "Cant open given file for parsing! IOError."
         except:
             raise FileError, "Cant open given file for parsing! Unknown Error."
             
@@ -55,10 +53,11 @@ class Library(object):
             data = self.file.read()
             self.filemd5 = hashlib.md5(data).hexdigest()
             
-            self.db = Database.MSSqlDB.MSSqlDB()
+            #self.db = Database.MSSqlDB.MSSqlDB()
+            self.db = Database.SQLiteDB.SQLiteDB()
             self.db.insert_library(self.filemd5,self.path,self.os,self.ftype)
             
-            select_string = "select id from t_library where libmd5 = 0x%s" % self.filemd5
+            select_string = "select id from t_library where libmd5 = '%s'" % self.filemd5
             self.id = self.db.select_id(select_string)
         
         
@@ -112,7 +111,8 @@ class Library(object):
     def parse_lstfile(self):
         # Regexes to scan for function offsets
         f_off = re.compile('^\.[a-zA-Z]+:[0-9a-fA-F]+.+(stdcall|cdecl|thiscall|fastcall|userpurge|usercall)')   
-        f_off2 = re.compile('^\.[a-zA-Z]+:[0-9a-fA-F]+ sub_')
+        # Deprecated:
+        # f_off2 = re.compile('^\.[a-zA-Z]+:[0-9a-fA-F]+ sub_')
         f_off3 = re.compile('START OF FUNCTION CHUNK')
         endp = re.compile('endp')
         

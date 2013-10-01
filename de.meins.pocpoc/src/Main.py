@@ -6,7 +6,8 @@ Created on 05.09.2013
 
 from optparse import OptionParser
 import Parsing.Library
-import Database.MSSqlDB
+#import Database.MSSqlDB
+import Database.SQLiteDB
 import os.path
 import sys
 import logging.config
@@ -80,9 +81,11 @@ def main():
     elif options.updatesigs == True:
         
         try:
-        
-            db = Database.MSSqlDB.MSSqlDB()
+            # !!! TEST !!!
+            # db = Database.MSSqlDB.MSSqlDB()
             
+            db = Database.SQLiteDB.SQLiteDB()
+             
             if options.flush == True or options.createall == True:
                 db.flush_all()
                 db.create_scheme()
@@ -91,10 +94,9 @@ def main():
             
             try:
                 sigfile = open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'conf', 'signatures.conf'))
-            except IOError:
-                log.error("Signatures.conf can't be read, check conf directory")
+                
             except:
-                log.error("Something went wrong when reading signature file: ", sys.exc_info[1])
+                log.error("Something went wrong when reading signature file.")
             else:  
                 for line in sigfile:
                     #sanitizing the signatures
@@ -104,7 +106,7 @@ def main():
                 sigfile.close()
         
         except:
-            log.error("Something went wrong when updating the signatures in DB: ", sys.exc_info()[1])
+            log.error("Something went wrong when updating the signatures in DB.")
         
     else:
         log.error("Wrong Arguments - type -h or --help for Info")
