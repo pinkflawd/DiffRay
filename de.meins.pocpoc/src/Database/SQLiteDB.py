@@ -24,7 +24,7 @@ class SQLiteDB(object):
     
     def __init__(self):
         try:
-            self.localdb = sqlite3.connect(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..','..', 'data', 'pocpoc.sqlite'))
+            self.localdb = sqlite3.connect(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..','..', 'data', 'pocpoc2.sqlite'))
         except:
             raise DatabaseError, "Connection to DB cant be established."
         
@@ -62,6 +62,7 @@ class SQLiteDB(object):
             cursor = self.localdb.cursor()
             cursor.execute(delete_string)
         except:
+            print delete_string
             raise DatabaseError, "An Error occurred when executing a delete."
         else:
             self.localdb.commit()
@@ -128,7 +129,6 @@ class SQLiteDB(object):
         if libid == 0:
             insert_string = "insert into t_library (libmd5, libname, os, filetype) values ('%s','%s', '%s', '%s')" % (filemd5, filename, os, ftype)
             self.insert(insert_string)
-            print "here"
             self.log.info("Library %s with id %s created" %(filename, filemd5))
         else:
             self.log.info("Library with id %s already exists" % filemd5)

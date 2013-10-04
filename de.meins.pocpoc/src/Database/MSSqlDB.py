@@ -10,7 +10,6 @@ import os.path
 from Exceptions import DatabaseError, FileError
 import logging.config
 
-
 class MSSqlDB(object):
 
     try:

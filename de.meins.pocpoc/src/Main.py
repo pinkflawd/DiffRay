@@ -8,11 +8,10 @@ from optparse import OptionParser
 import Parsing.Library
 #import Database.MSSqlDB
 import Database.SQLiteDB
-import os.path
 import sys
 import logging.config
 import re
-
+import os
 
 def main():
     
@@ -48,23 +47,34 @@ def main():
     
     ### OPTION parse ###
  
-    if options.filename is not None and options.os is not None and options.ftype is not None:
+    if (options.filename is not None or options.directory is not None) and options.os is not None and options.ftype is not None:
         
         try:
             
-            lib = Parsing.Library.Library(options.filename, options.os, options.ftype)
+            # if dir - enum dir and write filenames to list
+            # if no dir - write only filename to list?
             
-            # if lib exists - flush functions
-            lib.flush_me()
+            lib_files = []
             
-            if options.ftype == "c" or options.ftype == "C":
-                lib.parse_cfile()
-            elif options.ftype == "lst" or options.ftype == "LST":
-                lib.parse_lstfile()
+            if options.directory is not None:
+                lib_files = [os.path.join(options.directory, f) for f in os.listdir(options.directory) if os.path.isfile(os.path.join(options.directory,f))]
             else:
-                log.error("Wrong file type! Either c or C or lst or LST, pleeease dont mix caps with small letters, dont have all day for op parsing ;)")
-            
-            log.info("Finished Parsing")
+                lib_files.append(options.filename)
+                
+            for lib_file in lib_files:        
+                lib = Parsing.Library.Library(lib_file, options.os, options.ftype)
+                
+                # if lib exists - flush functions
+                lib.flush_me()
+                
+                if options.ftype == "c" or options.ftype == "C":
+                    lib.parse_cfile()
+                elif options.ftype == "lst" or options.ftype == "LST":
+                    lib.parse_lstfile()
+                else:
+                    log.error("Wrong file type! Either c or C or lst or LST, pleeease dont mix caps with small letters, dont have all day for op parsing ;)")
+                
+                log.info("Finished Parsing")
 
         except:
             log.error("Something went wrong when parsing a library: %s" % (sys.exc_info()[1]))
