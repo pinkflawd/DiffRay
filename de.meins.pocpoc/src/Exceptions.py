@@ -1,7 +1,7 @@
 '''
 Created on 18.09.2013
 
-@author: marschalek.m
+@author: pinkflawd
 '''
 
 

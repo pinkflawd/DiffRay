@@ -1,7 +1,7 @@
 '''
 Created on 05.09.2013
 
-@author: marschalek.m
+@author: pinkflawd
 '''
 
 import Database.MSSqlDB
@@ -10,10 +10,15 @@ import hashlib
 import re
 import logging.config
 import os
-
 from Exceptions import ParameterError, FileError
 
+
 class Library(object):
+    
+    '''
+    LIBRARY CLASS
+    represents a library in the database
+    '''
     
     try:
         logging.config.fileConfig(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..','..', 'conf', 'logger.conf'))
@@ -53,13 +58,15 @@ class Library(object):
             data = self.file.read()
             self.filemd5 = hashlib.md5(data).hexdigest()
             
+            #xtmp = os.path.exists('c:\\aa\\aaa.c')
+
             #self.db = Database.MSSqlDB.MSSqlDB()
             self.db = Database.SQLiteDB.SQLiteDB()
             self.db.insert_library(self.filemd5,self.path,self.os,self.ftype)
             
             select_string = "select id from t_library where libmd5 = '%s'" % self.filemd5
             self.id = self.db.select_id(select_string)
-        
+    
         
     def parse_cfile(self):
         
@@ -109,13 +116,13 @@ class Library(object):
             function.set_linecount(linecount)
  
     def parse_lstfile(self):
+        
+        # redundant code, i know, sorry..
+        
         # Regexes to scan for function offsets
         f_off = re.compile('^\.[a-zA-Z]+:[0-9a-fA-F]+.+(stdcall|cdecl|thiscall|fastcall|userpurge|usercall)')   
-        # Deprecated:
-        # f_off2 = re.compile('^\.[a-zA-Z]+:[0-9a-fA-F]+ sub_')
         f_off3 = re.compile('START OF FUNCTION CHUNK')
-        endp = re.compile('endp')
-        
+
         linecount = 0
         function = None
         

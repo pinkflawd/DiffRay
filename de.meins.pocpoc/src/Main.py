@@ -1,7 +1,7 @@
 '''
 Created on 05.09.2013
 
-@author: marschalek.m
+@author: pinkflawd
 '''
 
 from optparse import OptionParser
@@ -14,6 +14,12 @@ import re
 import os
 
 def main():
+    
+    '''
+    MAIN CLASS
+    command line option parsing
+    exception catching
+    '''
     
     try:
         logging.config.fileConfig(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'conf', 'logger.conf'))
@@ -30,7 +36,6 @@ def main():
     parser.add_option("-d", "--dirparse", dest="directory", help="The directory which contains EITHER c or lst files for ONE os! Needs OS and type option.")
     parser.add_option("-p", "--parse", dest="filename", help="The file to parse, needs the OS option and the type option too")
     parser.add_option("-o", "--os", dest="os", help="OS the Library belongs to, Win7 or Win8")
-    #TODO parse lst
     parser.add_option("-t", "--type", dest="ftype", help="Type of file to parse - .c or .lst")
     
     ### Maintenance
@@ -41,7 +46,6 @@ def main():
     
     # TODO add MORE
     # DB Backend?
-    # C or LST?
     
     (options, args) = parser.parse_args()
     
@@ -50,9 +54,6 @@ def main():
     if (options.filename is not None or options.directory is not None) and options.os is not None and options.ftype is not None:
         
         try:
-            
-            # if dir - enum dir and write filenames to list
-            # if no dir - write only filename to list?
             
             lib_files = []
             

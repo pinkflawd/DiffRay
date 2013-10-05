@@ -1,7 +1,7 @@
 '''
 Created on 06.09.2013
 
-@author: marschalek.m
+@author: pinkflawd
 '''
 
 import ConfigParser
@@ -11,6 +11,11 @@ from Exceptions import DatabaseError, FileError
 import logging.config
 
 class MSSqlDB(object):
+    
+    '''
+    MSSqlDB CLASS
+    database interaction with MS SQL database, configuration is in static.conf
+    '''
 
     try:
         logging.config.fileConfig(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..','..', 'conf', 'logger.conf'))

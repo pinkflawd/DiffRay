@@ -1,7 +1,7 @@
 '''
 Created on 12.09.2013
 
-@author: marschalek.m
+@author: pinkflawd
 '''
 
 import Database.MSSqlDB
@@ -11,7 +11,8 @@ import re
 
 class Function(object):
     '''
-    classdocs
+    FUNCTION CLASS
+    represents the functions of a library in the database
     '''
 
 

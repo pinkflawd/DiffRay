@@ -1,7 +1,7 @@
 '''
 Created on 18.09.2013
 
-@author: marschalek.m
+@author: pinkflawd
 '''
 
 import sqlite3
@@ -12,6 +12,11 @@ from Exceptions import DatabaseError
 
 
 class SQLiteDB(object):
+    
+    '''
+    SQLiteDB CLASS
+    interaction with sqlite, waaaay slower than mssql but totally portable ^^
+    '''
 
     try:
         logging.config.fileConfig(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..','..', 'conf', 'logger.conf'))
