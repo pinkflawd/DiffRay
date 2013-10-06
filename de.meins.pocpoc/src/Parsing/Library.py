@@ -62,7 +62,7 @@ class Library(object):
 
             #self.db = Database.MSSqlDB.MSSqlDB()
             self.db = Database.SQLiteDB.SQLiteDB()
-            self.db.insert_library(self.filemd5,self.path,self.os,self.ftype)
+            self.existant = self.db.insert_library(self.filemd5,self.path,self.os,self.ftype)
             
             select_string = "select id from t_library where libmd5 = '%s'" % self.filemd5
             self.id = self.db.select_id(select_string)
@@ -112,8 +112,12 @@ class Library(object):
                 else:
                     pass
             
-                    # dont forget last function ;)
-            function.set_linecount(linecount)
+            # dont forget last function ;)
+            # when there is no last function at all something went wrong - check c/lst file
+            if function is not None:
+                function.set_linecount(linecount)
+            else:
+                self.log.error("No Functions identified, check your decompiled library!")
  
     def parse_lstfile(self):
         

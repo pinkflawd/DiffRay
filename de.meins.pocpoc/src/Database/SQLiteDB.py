@@ -135,8 +135,10 @@ class SQLiteDB(object):
             insert_string = "insert into t_library (libmd5, libname, os, filetype) values ('%s','%s', '%s', '%s')" % (filemd5, filename, os, ftype)
             self.insert(insert_string)
             self.log.info("Library %s with id %s created" %(filename, filemd5))
+            return False
         else:
             self.log.info("Library with id %s already exists" % filemd5)
+            return True
                 
                 
     def insert_function(self, libid, funcname, linecount):

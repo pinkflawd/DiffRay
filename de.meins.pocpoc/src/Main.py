@@ -34,6 +34,7 @@ def main():
        
     ### Parsing
     parser.add_option("-d", "--dirparse", dest="directory", help="The directory which contains EITHER c or lst files for ONE os! Needs OS and type option.")
+    parser.add_option("-n", "--no-flush", action="store_true", dest="noflush", help="Continue parsing without flushing existing function info - mb the app crashed before..")
     parser.add_option("-p", "--parse", dest="filename", help="The file to parse, needs the OS option and the type option too")
     parser.add_option("-o", "--os", dest="os", help="OS the Library belongs to, Win7 or Win8")
     parser.add_option("-t", "--type", dest="ftype", help="Type of file to parse - .c or .lst")
@@ -66,16 +67,20 @@ def main():
                 lib = Parsing.Library.Library(lib_file, options.os, options.ftype)
                 
                 # if lib exists - flush functions
-                lib.flush_me()
+                # if lib exists and no-flush active - continue
+                if (lib.existant == True and options.noflush is None) or lib.existant == False:
+                    lib.flush_me()
                 
-                if options.ftype == "c" or options.ftype == "C":
-                    lib.parse_cfile()
-                elif options.ftype == "lst" or options.ftype == "LST":
-                    lib.parse_lstfile()
+                    if options.ftype == "c" or options.ftype == "C":
+                        lib.parse_cfile()
+                    elif options.ftype == "lst" or options.ftype == "LST":
+                        lib.parse_lstfile()
+                    else:
+                        log.error("Wrong file type! Either c or C or lst or LST, pleeease dont mix caps with small letters, dont have all day for op parsing ;)")
+                
+                    log.info("Finished Parsing")
                 else:
-                    log.error("Wrong file type! Either c or C or lst or LST, pleeease dont mix caps with small letters, dont have all day for op parsing ;)")
-                
-                log.info("Finished Parsing")
+                    log.info("Nothing to parse here, continue.")
 
         except:
             log.error("Something went wrong when parsing a library: %s" % (sys.exc_info()[1]))
