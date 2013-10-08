@@ -4,7 +4,6 @@ Created on 05.09.2013
 @author: pinkflawd
 '''
 
-import Database.MSSqlDB
 import Function
 import hashlib
 import re
@@ -29,7 +28,7 @@ class Library(object):
         exit(1)
 
 
-    def __init__(self, path, os, ftype):
+    def __init__(self, path, os, ftype, database):
         
         if len(path) < 300:
             sanipath = re.sub('\'','', path,0)
@@ -60,13 +59,18 @@ class Library(object):
             
             #xtmp = os.path.exists('c:\\aa\\aaa.c')
 
-            #self.db = Database.MSSqlDB.MSSqlDB()
-            self.db = Database.SQLiteDB.SQLiteDB()
+            if (database == "mssql"):
+                import Database.MSSqlDB
+                self.db = Database.MSSqlDB.MSSqlDB()
+                self.backend = "mssql"
+            else:
+                import Database.SQLiteDB
+                self.db = Database.SQLiteDB
+                self.backend = "sqlite"
+                
             self.existant = self.db.insert_library(self.filemd5,self.path,self.os,self.ftype)
-            
-            select_string = "select id from t_library where libmd5 = '%s'" % self.filemd5
-            self.id = self.db.select_id(select_string)
-    
+            self.id = self.db.select_libid(self.filemd5)
+           
         
     def parse_cfile(self):
         
@@ -96,7 +100,7 @@ class Library(object):
                         function.set_linecount(linecount)
                    
                     # create new function (object) with linecount 0
-                    function = Function.Function(self.id, line.rstrip(), 0)
+                    function = Function.Function(self.id, line.rstrip(), 0, self.backend)
                     linecount = 0
                     
                 elif function is not None and not comment.search(line):                      #inside a function and not a comment line
@@ -149,7 +153,7 @@ class Library(object):
                         function.set_linecount(linecount)
                    
                     # create new function (object) with linecount 0
-                    function = Function.Function(self.id, line.rstrip(), 0)
+                    function = Function.Function(self.id, line.rstrip(), 0, self.backend)
                     linecount = 0
                     
                 elif function is not None:                      #inside a function and not a comment line

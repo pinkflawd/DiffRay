@@ -4,7 +4,6 @@ Created on 12.09.2013
 @author: pinkflawd
 '''
 
-import Database.MSSqlDB
 from Exceptions import ParameterError
 import re
 
@@ -16,7 +15,7 @@ class Function(object):
     '''
 
 
-    def __init__(self, libid, funcname, linecount):
+    def __init__(self, libid, funcname, linecount, database):
         
         #if u wish so, check libid if integer. but basically, not necessary     
         self.libid = libid
@@ -33,11 +32,15 @@ class Function(object):
             raise ParameterError, "Linecount exceeds int range - weiiird should never happen."
         
         # might throw exception - theres no throws keyword :/
-        # self.db = Database.MSSqlDB.MSSqlDB()
-        self.db = Database.SQLiteDB.SQLiteDB()
+        if (database == "mssql"):
+            import Database.MSSqlDB
+            self.db = Database.MSSqlDB.MSSqlDB()
+        else:
+            import Database.SQLiteDB
+            self.db = Database.SQLiteDB
+                
         self.db.insert_function(self.libid,self.funcname,self.linecount)
-        select_string = "select id from t_function where libid = %i and funcname = '%s' and linecount = %i" % (self.libid,self.funcname,self.linecount)
-        self.id = self.db.select_id(select_string)
+        self.id = self.db.select_funcid(self.libid,self.funcname,self.linecount)
         
         
     def set_linecount(self,linecount):

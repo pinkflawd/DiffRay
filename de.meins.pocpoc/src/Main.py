@@ -6,8 +6,6 @@ Created on 05.09.2013
 
 from optparse import OptionParser
 import Parsing.Library
-#import Database.MSSqlDB
-import Database.SQLiteDB
 import sys
 import logging.config
 import re
@@ -43,12 +41,22 @@ def main():
     parser.add_option("-f", "--flushall", action="store_true", dest="flush", help="Flush the Database Scheme")
     parser.add_option("-c", "--create-scheme", action="store_true", dest="createall", help="(Re)Create Database Scheme (same as flushall option)")
     parser.add_option("-u", "--update-sigs", action="store_true", dest="updatesigs", help="Flushes the signature table and re-reads the signatures.conf for update")
+    
+    ### Database
+    parser.add_option("-b", "--backend", dest="database", help="Database backend to use, currently supported: sqlite (default), mssql - use mssql/MSSQL or sqlite/SQLITE !!!")
         
     
     # TODO add MORE
     # DB Backend?
     
     (options, args) = parser.parse_args()
+    
+    ### OPTION backend ###
+    
+    if (options.database == "mssql" or options.database == "MSSQL"):
+        database = "mssql"
+    else:
+        database = "sqlite"
     
     ### OPTION parse ###
  
@@ -64,7 +72,7 @@ def main():
                 lib_files.append(options.filename)
                 
             for lib_file in lib_files:        
-                lib = Parsing.Library.Library(lib_file, options.os, options.ftype)
+                lib = Parsing.Library.Library(lib_file, options.os, options.ftype, database)
                 
                 # if lib exists - flush functions
                 # if lib exists and no-flush active - continue
@@ -97,11 +105,14 @@ def main():
     elif options.updatesigs == True:
         
         try:
-            # !!! TEST !!!
-            # db = Database.MSSqlDB.MSSqlDB()
+            ###
+            if (database == "mssql"):
+                import Database.MSSqlDB
+                db = Database.MSSqlDB.MSSqlDB()
+            else:
+                import Database.SQLiteDB
+                db = Database.SQLiteDB
             
-            db = Database.SQLiteDB.SQLiteDB()
-             
             if options.flush == True or options.createall == True:
                 db.flush_all()
                 db.create_scheme()

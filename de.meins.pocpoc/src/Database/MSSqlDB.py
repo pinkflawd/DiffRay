@@ -124,6 +124,16 @@ class MSSqlDB(object):
         else:
             return 0
 
+    def select_funcid(self, libid, funcname, linecount):
+        select_string = "select id from [Poc].[dbo].[t_function] where libid = %i and funcname = '%s' and linecount = %i" % (libid,funcname,linecount)
+        id = self.select_id(select_string)
+        return self.select_id(select_string)
+
+    def select_libid(self, filemd5):
+        select_string = "select id from [Poc].[dbo].[t_library] where libmd5 = 0x%s" % filemd5
+        id = self.select_id(select_string)
+        return self.select_id(select_string)
+        
     def select_signatures(self):
         select_string = "select sigpattern from [Poc].[dbo].[t_signature]"
         res = self.select(select_string)

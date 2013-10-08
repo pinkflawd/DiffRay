@@ -93,6 +93,16 @@ class SQLiteDB(object):
             return row[0]
         else:
             return 0
+        
+    def select_funcid(self, libid, funcname, linecount):
+        select_string = "select id from t_function where libid = %i and funcname = '%s' and linecount = %i" % (libid,funcname,linecount)
+        id = self.select_id(select_string)
+        return id
+    
+    def select_libid(self, filemd5):
+        select_string = "select id from t_library where libmd5 = '%s'" % self.filemd5
+        id = self.select_id(select_string)
+        return id
 
     def select_signatures(self):
         select_string = "select sigpattern from t_signature"
