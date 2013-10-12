@@ -65,7 +65,7 @@ class Library(object):
                 self.backend = "mssql"
             else:
                 import Database.SQLiteDB
-                self.db = Database.SQLiteDB
+                self.db = Database.SQLiteDB.SQLiteDB()
                 self.backend = "sqlite"
                 
             self.existant = self.db.insert_library(self.filemd5,self.path,self.os,self.ftype)

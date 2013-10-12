@@ -20,11 +20,13 @@ class Function(object):
         #if u wish so, check libid if integer. but basically, not necessary     
         self.libid = libid
         
-        if len(funcname) < 999:
+        if len(funcname) < 2000:
             sanifname = re.sub('\'','', funcname,0)
+            sanifname = re.sub('^.+?(stdcall|cdecl|thiscall|fastcall|userpurge|usercall) ','',sanifname,1)
+            print sanifname
             self.funcname = sanifname
         else:
-            raise ParameterError, "A funcname for function object is too long, max 999 chars."
+            raise ParameterError, "A funcname for function object is too long, max 1999 chars."
         
         if linecount < 2147483647: 
             self.linecount = linecount
@@ -37,7 +39,7 @@ class Function(object):
             self.db = Database.MSSqlDB.MSSqlDB()
         else:
             import Database.SQLiteDB
-            self.db = Database.SQLiteDB
+            self.db = Database.SQLiteDB.SQLiteDB()
                 
         self.db.insert_function(self.libid,self.funcname,self.linecount)
         self.id = self.db.select_funcid(self.libid,self.funcname,self.linecount)

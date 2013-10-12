@@ -92,6 +92,7 @@ def main():
 
         except:
             log.error("Something went wrong when parsing a library: %s" % (sys.exc_info()[1]))
+            log.error("If MSSQL, are the access credentials right? Did you set the right permissions on the DB? Did you perform a create_all on mssql or sqlite?")
         
         
     ### OPTION recreate or flush incomplete ###
@@ -111,7 +112,7 @@ def main():
                 db = Database.MSSqlDB.MSSqlDB()
             else:
                 import Database.SQLiteDB
-                db = Database.SQLiteDB
+                db = Database.SQLiteDB.SQLiteDB()
             
             if options.flush == True or options.createall == True:
                 db.flush_all()

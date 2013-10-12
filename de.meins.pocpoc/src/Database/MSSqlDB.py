@@ -231,7 +231,7 @@ class MSSqlDB(object):
         create_string = """create table t_function (
                         id int identity(1,1) primary key not null,
                         libid int not null,
-                        funcname varchar(1000),
+                        funcname varchar(2000),
                         linecount int
                         )"""
         self.insert(create_string)

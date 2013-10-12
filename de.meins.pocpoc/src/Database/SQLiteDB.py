@@ -100,7 +100,7 @@ class SQLiteDB(object):
         return id
     
     def select_libid(self, filemd5):
-        select_string = "select id from t_library where libmd5 = '%s'" % self.filemd5
+        select_string = "select id from t_library where libmd5 = '%s'" % filemd5
         id = self.select_id(select_string)
         return id
 
@@ -131,7 +131,7 @@ class SQLiteDB(object):
     def flush_library(self, libid):
         delete_string = "delete from t_hit where libid = %i" % libid
         self.delete(delete_string)
-        delete_string = "delete from t_hit where libid = %i" % libid
+        delete_string = "delete from t_function where libid = %i" % libid
         self.delete(delete_string)
         
     def flush_signature(self):
