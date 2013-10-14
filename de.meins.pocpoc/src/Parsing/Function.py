@@ -23,7 +23,6 @@ class Function(object):
         if len(funcname) < 2000:
             sanifname = re.sub('\'','', funcname,0)
             sanifname = re.sub('^.+?(stdcall|cdecl|thiscall|fastcall|userpurge|usercall) ','',sanifname,1)
-            print sanifname
             self.funcname = sanifname
         else:
             raise ParameterError, "A funcname for function object is too long, max 1999 chars."

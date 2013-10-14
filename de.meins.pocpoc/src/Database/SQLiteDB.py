@@ -103,6 +103,11 @@ class SQLiteDB(object):
         select_string = "select id from t_library where libmd5 = '%s'" % filemd5
         id = self.select_id(select_string)
         return id
+    
+    def select_libids_byname(self, libname):
+        select_string = "select id, libname from t_library where libname like '%%%s%%'" % libname
+        res = self.select(select_string)
+        return res
 
     def select_signatures(self):
         select_string = "select sigpattern from t_signature"

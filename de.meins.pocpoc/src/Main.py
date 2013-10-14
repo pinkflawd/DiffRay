@@ -45,9 +45,9 @@ def main():
     ### Database
     parser.add_option("-b", "--backend", dest="database", help="Database backend to use, currently supported: sqlite (default), mssql - use mssql/MSSQL or sqlite/SQLITE !!!")
         
+    ### Diffing
+    parser.add_option("-s", "--search_libs", dest="libname", help="Provide a library name (without .dll ending!!) to be searched in the DB, gives you the IDs you need for diffing!")
     
-    # TODO add MORE
-    # DB Backend?
     
     (options, args) = parser.parse_args()
     
@@ -55,9 +55,13 @@ def main():
     
     if (options.database == "mssql" or options.database == "MSSQL"):
         database = "mssql"
+        import Database.MSSqlDB
+        db = Database.MSSqlDB.MSSqlDB()
     else:
         database = "sqlite"
-    
+        import Database.SQLiteDB
+        db = Database.SQLiteDB.SQLiteDB()
+
     ### OPTION parse ###
  
     if (options.filename is not None or options.directory is not None) and options.os is not None and options.ftype is not None:
@@ -106,13 +110,6 @@ def main():
     elif options.updatesigs == True:
         
         try:
-            ###
-            if (database == "mssql"):
-                import Database.MSSqlDB
-                db = Database.MSSqlDB.MSSqlDB()
-            else:
-                import Database.SQLiteDB
-                db = Database.SQLiteDB.SQLiteDB()
             
             if options.flush == True or options.createall == True:
                 db.flush_all()
@@ -136,6 +133,15 @@ def main():
         except:
             log.error("Something went wrong when updating the signatures in DB.")
         
+    ### OPTION search_libs gets you the lib IDs to a given libname ###
+    
+    elif options.libname is not None:
+        sanilibname = re.sub('\'','', options.libname,0)
+        print "Here are the IDs that could identify the lib %s:" % sanilibname
+        ids = db.select_libids_byname(sanilibname)
+        for item in ids:
+            print "Library ID %s for %s" % (item[0], item[1])
+    
     else:
         log.error("Wrong Arguments - type -h or --help for Info")
         
