@@ -6,6 +6,7 @@ Created on 05.09.2013
 
 from optparse import OptionParser
 import Parsing.Library
+import Diffing.Info
 import sys
 import logging.config
 import re
@@ -47,7 +48,10 @@ def main():
         
     ### Diffing
     parser.add_option("-s", "--search_libs", dest="libname", help="Provide a library name (without .dll ending!!) to be searched in the DB, gives you the IDs you need for diffing!")
-    
+    parser.add_option("-a", "--lib_all_info", dest="lib_allinfo", help="Takes one libid as argument and prints all hit information in csv format")
+    parser.add_option("-i", "--diff", action="store_true", dest="diff", help="Diffing of two libraries, needs arguments lib1 and lib2, lib1 should be win7 as baselib, lib2 for win8")
+    parser.add_option("-1", "--lib_1", dest="lib_one", help="Baselib for diffing - Win7 goes here")
+    parser.add_option("-2", "--lib_2", dest="lib_two", help="Difflib for diffing - Win8 goes here")
     
     (options, args) = parser.parse_args()
     
@@ -136,12 +140,40 @@ def main():
     ### OPTION search_libs gets you the lib IDs to a given libname ###
     
     elif options.libname is not None:
+        # sanitizing
         sanilibname = re.sub('\'','', options.libname,0)
-        print "Here are the IDs that could identify the lib %s:" % sanilibname
-        ids = db.select_libids_byname(sanilibname)
-        for item in ids:
-            print "Library ID %s for %s" % (item[0], item[1])
+        info = Diffing.Info.Info(database)
+        info.search_libs(sanilibname)
     
+    ### OPTION lib_allinfo prints all hit information of one library, given the libid
+    
+    elif options.lib_allinfo is not None:
+        try:
+            libid = int(options.lib_allinfo)
+        except ValueError:
+            log.error("Libid has to be numeric!")
+        else:
+            info = Diffing.Info.Info(database)
+            info.library_info(libid)
+    
+    ### OPTION diff puts out csv content on the commandline or into a pipe, containing hitcounts of a win7 lib compared with a win8 lib ###
+    
+    elif options.diff == True:
+        
+        if options.lib_one is not None or options.lib_two is not None:
+            
+            try:
+                w7lib = int(options.lib_one)
+                w8lib = int(options.lib_two)
+            except ValueError:
+                log.error("Libids have to be numeric!")
+            else:
+                info = Diffing.Info.Info(database)
+                info.diff_libs(w7lib, w8lib)
+                
+        else:
+            log.error("The Diff Option needs two valid library IDs, get them using the search_libs option, providing a library name!")
+        
     else:
         log.error("Wrong Arguments - type -h or --help for Info")
         

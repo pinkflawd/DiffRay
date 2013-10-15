@@ -12,6 +12,7 @@ import re
 
 try:
     localdb = sqlite3.connect(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'data', 'pocpoc2.sqlite'))
+    localdb.row_factory = sqlite3.Row
 except:
     raise DatabaseError, "Connection to DB cant be established."
 
@@ -26,33 +27,28 @@ def select(select_string):
         return cursor
     
 
-mycur = select("""SELECT h.sigpattern, f.funcname, count(*) 
-                FROM t_hit h, t_function f where h.funcid=f.id
-                and h.libid=2
-                group by f.funcname, h.sigpattern
-                order by f.funcname, h.sigpattern"""
-              )
 
-res = mycur.fetchmany(1000)
+cur_win7 = localdb.select_diff_win7(2)
+
+res = cur_win7.fetchmany(1000)
+
+print "Function_Name;Pattern;Win7_Hits;Win8_Hits"
 
 while res:
-    for pattern7, funcname, hitcount in res:
+    for pattern7, funcname, hitcount7 in res:
         fsplit = re.split('\(', funcname, 1, 0)
-        print "Win7: %s %s %s" % (fsplit[0],pattern7, hitcount)
         
-        select_diff = """select h.sigpattern, count(*) from t_hit h, t_function f where h.funcid=f.id
-                         and h.libid=3
-                         and h.sigpattern='%s'
-                         and f.funcname like '%s%%'
-                         group by f.funcname, h.sigpattern""" % (pattern7,fsplit[0])
-        cur2 = select(select_diff)
-        diff = cur2.fetchall()
-        for pattern8, count in diff:
-            print "Win8: %s %s %s" % (fsplit[0],pattern8,count)
-        print "\n"
+        cur_win8 = localdb.select_diff_win8(pattern7,fsplit[0])
+        diff = cur_win8.fetchone()
+        
+        if diff:
+            print "%s;%s;%s;%s" % (fsplit[0],pattern7,hitcount7,diff['co'])
+        else:
+            print "%s;%s;%s;" % (fsplit[0],pattern7,hitcount7)
+
     
              
-    res = mycur.fetchmany(1000)
+    res = cur_win7.fetchmany(1000)
 
 
 

@@ -30,6 +30,8 @@ class SQLiteDB(object):
     def __init__(self):
         try:
             self.localdb = sqlite3.connect(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..','..', 'data', 'pocpoc2.sqlite'))
+            # set row factory to Row type for accessing rows as dictionaries
+            self.localdb.row_factory = sqlite3.Row
         except:
             raise DatabaseError, "Connection to DB cant be established."
         
@@ -104,10 +106,7 @@ class SQLiteDB(object):
         id = self.select_id(select_string)
         return id
     
-    def select_libids_byname(self, libname):
-        select_string = "select id, libname from t_library where libname like '%%%s%%'" % libname
-        res = self.select(select_string)
-        return res
+
 
     def select_signatures(self):
         select_string = "select sigpattern from t_signature"
@@ -177,6 +176,43 @@ class SQLiteDB(object):
         self.update(update_string)
         
         
+    ### INFO TASKS
+    
+    # gets libids for performing more Info tasks
+    def select_libids_byname(self, libname):
+        select_string = "select id, libname from t_library where libname like '%%%s%%'" % libname
+        res = self.select(select_string)
+        return res
+    
+    # returns a set of hitcounts, grouped by funcname and sigpattern for whole lib
+    def select_diff_win7(self, libid):
+        select_string = """SELECT h.sigpattern, f.funcname, count(*) co
+                FROM t_hit h, t_function f where h.funcid=f.id
+                and h.libid=%s
+                group by f.funcname, h.sigpattern
+                order by f.funcname, h.sigpattern""" % libid
+                
+        print select_string
+        cur_win7 = self.select(select_string)
+        return cur_win7
+
+    
+    # returns a set of hitcounts, matching funcname and sigpattern of a line of a win7_diff set
+    def select_diff_win8(self, libid, pattern, funcname):
+        select_string = """select count(*) co from t_hit h, t_function f where h.funcid=f.id
+                         and h.libid=%s
+                         and h.sigpattern='%s'
+                         and f.funcname like '%%%s%%'
+                         group by f.funcname, h.sigpattern""" % (libid,pattern,funcname)
+        cur_win8 = self.select(select_string)
+        return cur_win8
+    
+    #returns all hits found for a certain libid
+    def select_lib_all(self, libid):
+        select_string = """select l.libname, f.funcname, h.sigpattern, h.line_offset from t_hit h, t_function f, t_library l 
+                           where h.libid = l.id and h.funcid = f.id and h.libid=%s""" % libid
+        return self.select(select_string)
+        
     ###########################
     # Scheme Re-Creation      #
     # t_library               #
@@ -226,3 +262,13 @@ class SQLiteDB(object):
 
         self.log.info("Database recreated")
         
+
+
+    ### UTIL
+    
+    @staticmethod
+    def dict_factory(cursor, row):
+        d = {}
+        for idx, col in enumerate(cursor.description):
+            d[col[0]] = row[idx]
+        return d

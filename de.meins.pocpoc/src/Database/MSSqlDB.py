@@ -114,8 +114,7 @@ class MSSqlDB(object):
     # Extended Operations     #
     ###########################
     
-    # TODO rename id columns, aggregate select_id function
-    
+    # SELECT object's ids
     def select_id(self, select_string):
         cur = self.select(select_string)
         row = cur.fetchone()
@@ -126,14 +125,12 @@ class MSSqlDB(object):
 
     def select_funcid(self, libid, funcname, linecount):
         select_string = "select id from [Poc].[dbo].[t_function] where libid = %i and funcname = '%s' and linecount = %i" % (libid,funcname,linecount)
-        id = self.select_id(select_string)
         return self.select_id(select_string)
 
     def select_libid(self, filemd5):
         select_string = "select id from [Poc].[dbo].[t_library] where libmd5 = 0x%s" % filemd5
-        id = self.select_id(select_string)
         return self.select_id(select_string)
-        
+
     def select_signatures(self):
         select_string = "select sigpattern from [Poc].[dbo].[t_signature]"
         res = self.select(select_string)
@@ -141,6 +138,8 @@ class MSSqlDB(object):
         for sig in res:
             signatures.append(sig['sigpattern'])
         return signatures
+    
+    # FLUSHING operations
     
     def flush_all(self):
         drop_string = """IF OBJECT_ID('[Poc].[dbo].[t_hit]','U') IS NOT NULL
@@ -168,11 +167,11 @@ class MSSqlDB(object):
         delete_string = "delete from [Poc].[dbo].[t_function] where libid = %s" % libid
         self.delete(delete_string)
         
-        
     def flush_signature(self):
         delete_string = "delete from [Poc].[dbo].[t_signature]"
         self.delete(delete_string)
         
+    # INSERT and UPDATE operations
     
     def insert_library(self, filemd5, filename, os, ftype):
         
@@ -186,7 +185,6 @@ class MSSqlDB(object):
         else:
             self.log.info("Library with id %s already exists" % filemd5)
             return True
-                
                 
     def insert_function(self, libid, funcname, linecount):
         insert_string = "insert into [Poc].[dbo].[t_function] (libid, funcname, linecount) values (%i, '%s', %i)" % (libid, funcname, linecount)
@@ -210,6 +208,42 @@ class MSSqlDB(object):
         update_string = "update [Poc].[dbo].[t_function] set linecount = %i where id = %i" % (linecount, funcid)
         self.update(update_string)
         
+        
+        
+    ### INFO TASKS
+    
+    # gets libids for performing more Info tasks
+    def select_libids_byname(self, libname):
+        select_string = "select id, libname from [Poc].[dbo].[t_library] where libname like '%%%s%%'" % libname
+        return self.select(select_string)
+        
+    # returns a set of hitcounts, grouped by funcname and sigpattern for whole lib
+    def select_diff_win7(self, libid):
+        select_string = """SELECT h.sigpattern, f.funcname, count(*) co
+                FROM [Poc].[dbo].[t_hit] h, [Poc].[dbo].[t_function] f where h.funcid=f.id
+                and h.libid=%s
+                group by f.funcname, h.sigpattern
+                order by f.funcname, h.sigpattern""" % libid
+        cur_win7 = self.select(select_string)
+        return cur_win7
+    
+    # returns a set of hitcounts, matching funcname and sigpattern of a line of a win7_diff set
+    def select_diff_win8(self, libid, pattern, funcname):
+        select_string = """select count(*) co from [Poc].[dbo].[t_hit] h, [Poc].[dbo].[t_function] f where h.funcid=f.id
+                         and h.libid=%s
+                         and h.sigpattern='%s'
+                         and f.funcname like '%s%%'
+                         group by f.funcname, h.sigpattern""" % (libid,pattern,funcname)
+        cur_win8 = self.select(select_string)
+        return cur_win8
+    
+    #returns all hits found for a certain libid
+    def select_lib_all(self, libid):
+        select_string = """select l.libname, f.funcname, h.sigpattern, h.line_offset from t_hit h, t_function f, t_library l 
+                           where h.libid = l.id and h.funcid = f.id and h.libid=%s""" % libid
+        return self.select(select_string)
+
+    
     ###########################
     # Scheme Re-Creation      #
     # t_library               #
