@@ -105,8 +105,6 @@ class SQLiteDB(object):
         select_string = "select id from t_library where libmd5 = '%s'" % filemd5
         id = self.select_id(select_string)
         return id
-    
-
 
     def select_signatures(self):
         select_string = "select sigpattern from t_signature"
@@ -179,8 +177,8 @@ class SQLiteDB(object):
     ### INFO TASKS
     
     # gets libids for performing more Info tasks
-    def select_libids_byname(self, libname):
-        select_string = "select id, libname from t_library where libname like '%%%s%%'" % libname
+    def select_libs_byname(self, libname):
+        select_string = "select id, libname, os, filetype from t_library where libname like '%%%s%%'" % libname
         res = self.select(select_string)
         return res
     
@@ -211,6 +209,11 @@ class SQLiteDB(object):
     def select_lib_all(self, libid):
         select_string = """select l.libname, f.funcname, h.sigpattern, h.line_offset from t_hit h, t_function f, t_library l 
                            where h.libid = l.id and h.funcid = f.id and h.libid=%s""" % libid
+        return self.select(select_string)
+ 
+    # get the os of a lib           
+    def select_os(self,libid):
+        select_string = "select os from t_library where id = %i" % libid
         return self.select(select_string)
         
     ###########################
@@ -263,12 +266,3 @@ class SQLiteDB(object):
         self.log.info("Database recreated")
         
 
-
-    ### UTIL
-    
-    @staticmethod
-    def dict_factory(cursor, row):
-        d = {}
-        for idx, col in enumerate(cursor.description):
-            d[col[0]] = row[idx]
-        return d

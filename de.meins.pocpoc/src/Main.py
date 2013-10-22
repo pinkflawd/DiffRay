@@ -52,6 +52,7 @@ def main():
     parser.add_option("-i", "--diff", action="store_true", dest="diff", help="Diffing of two libraries, needs arguments lib1 and lib2, lib1 should be win7 as baselib, lib2 for win8")
     parser.add_option("-1", "--lib_1", dest="lib_one", help="Baselib for diffing - Win7 goes here")
     parser.add_option("-2", "--lib_2", dest="lib_two", help="Difflib for diffing - Win8 goes here")
+    parser.add_option("-e", "--diff_byname", dest="diffbyname", help="Diff two libs by name, provide a libname like advapi32.c. CAUTION: Tool aborts when more than 2 libs are matched and DOES NOT VERIFY if the two difflibs belong together.")
     
     (options, args) = parser.parse_args()
     
@@ -174,6 +175,17 @@ def main():
         else:
             log.error("The Diff Option needs two valid library IDs, get them using the search_libs option, providing a library name!")
         
+    ### OPTION diff_byname
+    
+    elif options.diffbyname is not None:
+        sanilibname = re.sub('\'','', options.diffbyname,0)
+        info = Diffing.Info.Info(database)
+        ids = info.search_libs_diffing(sanilibname)
+        if (ids != -1):
+            info.diff_libs(ids[0],ids[1])   # 0.. Win7, 1.. Win8
+        else:
+            log.error("Something went wrong when choosing libs, maybe more than 2 matches or two libs with the same OS? Or different filetypes? Check with search_libs option!")
+    
     else:
         log.error("Wrong Arguments - type -h or --help for Info")
         

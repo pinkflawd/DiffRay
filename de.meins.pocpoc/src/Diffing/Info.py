@@ -8,12 +8,12 @@ import re
 
 class Info(object):
     '''
-    classdocs
+    INFO CLASS
+    
+    does all the info gathering out of the database
+    stupid name i know
     '''
 
-    # TODO: list one lib + its hits
-    # search for libids
-    # diff 2 libs based on their ids
 
     def __init__(self, database):
         if (database == "mssql"):
@@ -25,11 +25,44 @@ class Info(object):
         
         
     def search_libs(self, libname):
-        print "Here are the IDs that could identify the requested lib %s:" % libname
-        ids = self.db.select_libids_byname(libname)
+        ids = self.db.select_libs_byname(libname)
         for item in ids:
-            print "Library ID %s for %s" % (item['id'], item['libname'])
-            
+            print "Library ID %s for %s with type %s and OS %s" % (item['id'], item['libname'], item['filetype'], item['os'])
+    
+    
+    def search_libs_diffing(self, libname):
+        cur = self.db.select_libs_byname(libname)
+        ids = cur.fetchall()    # without fetch the rowcount is always -1
+        wids = []
+        
+        # works only for Win7/Win8 diffing !!
+        if cur.rowcount == 2:
+            if (ids[0]['filetype'].lower() == ids[1]['filetype'].lower()):
+                if (ids[0]['os'] != ids[1]['os']):
+                    
+                    if (ids[0]['os'] == 'Win7'):
+                        wids.append(ids[0]['id'])
+                    elif (ids[1]['os'] == 'Win7'):
+                        wids.append(ids[1]['id'])
+                    else:
+                        return -1
+                    
+                    if (ids[0]['os'] == 'Win8'):
+                        wids.append(ids[0]['id'])
+                    elif (ids[1]['os'] == 'Win8'):
+                        wids.append(ids[1]['id'])
+                    else:
+                        return -1
+                    
+                    return wids
+                else:
+                    return -1
+            else:
+                return -1
+        else:
+            return -1
+
+    
     def diff_libs(self, w7lib, w8lib):
         
         cur_win7 = self.db.select_diff_win7(w7lib)

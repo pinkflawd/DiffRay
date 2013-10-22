@@ -213,8 +213,8 @@ class MSSqlDB(object):
     ### INFO TASKS
     
     # gets libids for performing more Info tasks
-    def select_libids_byname(self, libname):
-        select_string = "select id, libname from [Poc].[dbo].[t_library] where libname like '%%%s%%'" % libname
+    def select_libs_byname(self, libname):
+        select_string = "select id, libname, os, filetype from [Poc].[dbo].[t_library] where libname like '%%%s%%'" % libname
         return self.select(select_string)
         
     # returns a set of hitcounts, grouped by funcname and sigpattern for whole lib
@@ -239,10 +239,14 @@ class MSSqlDB(object):
     
     #returns all hits found for a certain libid
     def select_lib_all(self, libid):
-        select_string = """select l.libname, f.funcname, h.sigpattern, h.line_offset from t_hit h, t_function f, t_library l 
+        select_string = """select l.libname, f.funcname, h.sigpattern, h.line_offset from [Poc].[dbo].[t_hit] h, [Poc].[dbo].[t_function] f, [Poc].[dbo].[t_library] l 
                            where h.libid = l.id and h.funcid = f.id and h.libid=%s""" % libid
         return self.select(select_string)
 
+    # get the os of a lib
+    def select_os(self,libid):
+        select_string = "select os from [Poc].[dbo].[t_library] where id = %i" % libid
+        return self.select(select_string)
     
     ###########################
     # Scheme Re-Creation      #
