@@ -49,9 +49,9 @@ def main():
     ### Diffing
     parser.add_option("-s", "--search_libs", dest="libname", help="Provide a library name (without .dll ending!!) to be searched in the DB, gives you the IDs you need for diffing!")
     parser.add_option("-a", "--lib_all_info", dest="lib_allinfo", help="Takes one libid as argument and prints all hit information in csv format")
-    parser.add_option("-i", "--diff", action="store_true", dest="diff", help="Diffing of two libraries, needs arguments lib1 and lib2, lib1 should be win7 as baselib, lib2 for win8")
-    parser.add_option("-1", "--lib_1", dest="lib_one", help="Baselib for diffing - Win7 goes here")
-    parser.add_option("-2", "--lib_2", dest="lib_two", help="Difflib for diffing - Win8 goes here")
+    parser.add_option("-i", "--diff", action="store_true", dest="diff", help="Diffing of two libraries, needs arguments lib1 and lib2, lib1 should be win7 as difflib, lib2 for win8 as baselib")
+    parser.add_option("-1", "--lib_1", dest="lib_one", help="Difflib for diffing - Win7 goes here")
+    parser.add_option("-2", "--lib_2", dest="lib_two", help="Baselib for diffing - Win8 goes here")
     parser.add_option("-e", "--diff_byname", dest="diffbyname", help="Diff two libs by name, provide a libname like advapi32.c. CAUTION: Tool aborts when more than 2 libs are matched and DOES NOT VERIFY if the two difflibs belong together.")
     
     (options, args) = parser.parse_args()

@@ -56,6 +56,7 @@ class Library(object):
             
             data = self.file.read()
             self.filemd5 = hashlib.md5(data).hexdigest()
+            self.file.close()
             
             #xtmp = os.path.exists('c:\\aa\\aaa.c')
 

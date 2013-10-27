@@ -183,7 +183,7 @@ class SQLiteDB(object):
         return res
     
     # returns a set of hitcounts, grouped by funcname and sigpattern for whole lib
-    def select_diff_win7(self, libid):
+    def select_diff_one(self, libid):
         select_string = """SELECT h.sigpattern, f.funcname, count(*) co
                 FROM t_hit h, t_function f where h.funcid=f.id
                 and h.libid=%s
@@ -196,7 +196,7 @@ class SQLiteDB(object):
 
     
     # returns a set of hitcounts, matching funcname and sigpattern of a line of a win7_diff set
-    def select_diff_win8(self, libid, pattern, funcname):
+    def select_diff_two(self, libid, pattern, funcname):
         select_string = """select count(*) co from t_hit h, t_function f where h.funcid=f.id
                          and h.libid=%s
                          and h.sigpattern='%s'
@@ -211,6 +211,16 @@ class SQLiteDB(object):
                            where h.libid = l.id and h.funcid = f.id and h.libid=%s""" % libid
         return self.select(select_string)
  
+    #checks if function exists in library
+    def select_function(self, funcname, libid):
+        select_string = """select id from t_function where funcname like '%s%%' and libid=%s""" % (funcname, libid)
+        cur = self.select(select_string)
+        row = cur.fetchone()
+        if row:
+            return True
+        else:
+            return False     
+        
     # get the os of a lib           
     def select_os(self,libid):
         select_string = "select os from t_library where id = %i" % libid

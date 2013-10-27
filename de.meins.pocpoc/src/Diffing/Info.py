@@ -65,24 +65,24 @@ class Info(object):
     
     def diff_libs(self, w7lib, w8lib):
         
-        cur_win7 = self.db.select_diff_win7(w7lib)
-        res = cur_win7.fetchmany(1000)
+        cur_one = self.db.select_diff_one(w8lib)
+        res = cur_one.fetchall()
          
-        print "Function_Name;Pattern;Win7_Hits;Win8_Hits"
-        
-        while res:
-            for item in res:
-                fsplit = re.split('\(', item['funcname'], 1, 0)
-                
-                cur_win8 = self.db.select_diff_win8(w8lib,item['sigpattern'],fsplit[0])
-                hitcount8 = cur_win8.fetchone()
-                
-                if hitcount8:
-                    print "%s;%s;%s;%s" % (fsplit[0],item['sigpattern'],item['co'],hitcount8['co'])
-                else:
-                    print "%s;%s;%s;" % (fsplit[0],item['sigpattern'],item['co'])
-        
-            res = cur_win7.fetchmany(1000)
+        print "Function_Name;Pattern;Win8_Hits;Win7_Hits"
+
+        for item in res:
+            fsplit = re.split('\(', item['funcname'], 1, 0)
+            
+            cur_two = self.db.select_diff_two(w7lib,item['sigpattern'],fsplit[0])
+            hitcount_two = cur_two.fetchone()
+             
+            if hitcount_two:
+                print "%s;%s;%s;%s" % (fsplit[0],item['sigpattern'],item['co'],hitcount_two['co'])
+            elif (self.db.select_function(fsplit[0], w7lib)):
+                print "%s;%s;%s;0" % (fsplit[0],item['sigpattern'],item['co'])
+            else:
+                print "%s;%s;%s;func_non_existent" % (fsplit[0],item['sigpattern'],item['co'])
+
 
     def library_info(self,libid):
         

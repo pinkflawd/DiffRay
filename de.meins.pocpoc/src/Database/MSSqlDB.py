@@ -30,7 +30,7 @@ class MSSqlDB(object):
         
         try:
             conf = ConfigParser.ConfigParser()
-            conf.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'conf', 'static.conf'))
+            conf.read(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'conf', 'mssql.conf'))
         except:
             raise FileError, "Static.conf cant be accessed."
         else:
@@ -218,30 +218,40 @@ class MSSqlDB(object):
         return self.select(select_string)
         
     # returns a set of hitcounts, grouped by funcname and sigpattern for whole lib
-    def select_diff_win7(self, libid):
+    def select_diff_one(self, libid):
         select_string = """SELECT h.sigpattern, f.funcname, count(*) co
                 FROM [Poc].[dbo].[t_hit] h, [Poc].[dbo].[t_function] f where h.funcid=f.id
                 and h.libid=%s
                 group by f.funcname, h.sigpattern
                 order by f.funcname, h.sigpattern""" % libid
-        cur_win7 = self.select(select_string)
-        return cur_win7
+        cur_one = self.select(select_string)
+        return cur_one
     
     # returns a set of hitcounts, matching funcname and sigpattern of a line of a win7_diff set
-    def select_diff_win8(self, libid, pattern, funcname):
+    def select_diff_two(self, libid, pattern, funcname):
         select_string = """select count(*) co from [Poc].[dbo].[t_hit] h, [Poc].[dbo].[t_function] f where h.funcid=f.id
                          and h.libid=%s
                          and h.sigpattern='%s'
                          and f.funcname like '%s%%'
                          group by f.funcname, h.sigpattern""" % (libid,pattern,funcname)
-        cur_win8 = self.select(select_string)
-        return cur_win8
+        cur_two = self.select(select_string)
+        return cur_two
     
     #returns all hits found for a certain libid
     def select_lib_all(self, libid):
         select_string = """select l.libname, f.funcname, h.sigpattern, h.line_offset from [Poc].[dbo].[t_hit] h, [Poc].[dbo].[t_function] f, [Poc].[dbo].[t_library] l 
                            where h.libid = l.id and h.funcid = f.id and h.libid=%s""" % libid
         return self.select(select_string)
+    
+    #checks if function exists in library
+    def select_function(self, funcname, libid):
+        select_string = """select id from [Poc].[dbo].[t_function] where funcname like '%s%%' and libid=%s""" % (funcname, libid)
+        cur = self.select(select_string)
+        row = cur.fetchone()
+        if row:
+            return True
+        else:
+            return False 
 
     # get the os of a lib
     def select_os(self,libid):
