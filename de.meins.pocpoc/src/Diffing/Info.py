@@ -45,6 +45,7 @@ class Info(object):
                     elif (ids[1]['os'] == 'Win7'):
                         wids.append(ids[1]['id'])
                     else:
+                        print "1"
                         return -1
                     
                     if (ids[0]['os'] == 'Win8'):
@@ -52,14 +53,18 @@ class Info(object):
                     elif (ids[1]['os'] == 'Win8'):
                         wids.append(ids[1]['id'])
                     else:
+                        print "2"
                         return -1
                     
                     return wids
                 else:
+                    print "3"
                     return -1
             else:
+                print "4"
                 return -1
         else:
+            print "5"
             return -1
 
     
@@ -83,6 +88,8 @@ class Info(object):
             else:
                 print "%s;%s;%s;func_non_existent" % (fsplit[0],item['sigpattern'],item['co'])
 
+    def get_0oes(self, w7lib, w8lib):
+        pass
 
     def library_info(self,libid):
         

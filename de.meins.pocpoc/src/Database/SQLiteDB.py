@@ -69,7 +69,6 @@ class SQLiteDB(object):
             cursor = self.localdb.cursor()
             cursor.execute(delete_string)
         except:
-            print delete_string
             raise DatabaseError, "An Error occurred when executing a delete."
         else:
             self.localdb.commit()
@@ -190,7 +189,6 @@ class SQLiteDB(object):
                 group by f.funcname, h.sigpattern
                 order by f.funcname, h.sigpattern""" % libid
                 
-        print select_string
         cur_win7 = self.select(select_string)
         return cur_win7
 
