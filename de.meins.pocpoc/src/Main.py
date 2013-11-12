@@ -182,7 +182,8 @@ def main():
         info = Diffing.Info.Info(database)
         ids = info.search_libs_diffing(sanilibname)
         if (ids != -1):
-            info.diff_libs(ids[0],ids[1])   # 0.. Win7, 1.. Win8
+            #info.diff_libs(ids[0],ids[1])   # 0.. Win7, 1.. Win8
+            info.diff_twosided(ids[0],ids[1])
         else:
             log.error("Something went wrong when choosing libs, maybe more than 2 matches or two libs with the same OS? Or different filetypes? Check with search_libs option!")
     

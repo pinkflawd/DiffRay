@@ -36,7 +36,7 @@ class Info(object):
         wids = []
         
         # works only for Win7/Win8 diffing !!
-        if cur.rowcount == 2:
+        if len(ids) == 2:
             if (ids[0]['filetype'].lower() == ids[1]['filetype'].lower()):
                 if (ids[0]['os'] != ids[1]['os']):
                     
@@ -45,7 +45,6 @@ class Info(object):
                     elif (ids[1]['os'] == 'Win7'):
                         wids.append(ids[1]['id'])
                     else:
-                        print "1"
                         return -1
                     
                     if (ids[0]['os'] == 'Win8'):
@@ -53,18 +52,14 @@ class Info(object):
                     elif (ids[1]['os'] == 'Win8'):
                         wids.append(ids[1]['id'])
                     else:
-                        print "2"
                         return -1
                     
                     return wids
                 else:
-                    print "3"
                     return -1
             else:
-                print "4"
                 return -1
         else:
-            print "5"
             return -1
 
     
@@ -87,12 +82,46 @@ class Info(object):
                 print "%s;%s;%s;0" % (fsplit[0],item['sigpattern'],item['co'])
             else:
                 print "%s;%s;%s;func_non_existent" % (fsplit[0],item['sigpattern'],item['co'])
-
-    def get_0oes(self, w7lib, w8lib):
-        pass
-
-    def library_info(self,libid):
         
+    def diff_twosided(self, w7lib, w8lib):
+
+        cur_one = self.db.select_diff_one(w8lib)
+        res = cur_one.fetchall()
+         
+        print "\nFunction_Name;Pattern;Win8_Hits;Win7_Hits"
+
+        for item in res:
+            fsplit = re.split('\(', item['funcname'], 1, 0)
+            
+            cur_two = self.db.select_diff_two(w7lib,item['sigpattern'],fsplit[0])
+            hitcount_two = cur_two.fetchone()
+             
+            if (hitcount_two):
+                if item['co'] != hitcount_two['co']:
+                    print "%s;%s;%s;%s" % (fsplit[0],item['sigpattern'],item['co'],hitcount_two['co'])
+
+            elif (self.db.select_function(fsplit[0], w7lib)):
+                print "%s;%s;%s;0" % (fsplit[0],item['sigpattern'],item['co'])
+
+        print "\nFunction_Name;Pattern;Win7_Hits;Win8_Hits"
+        
+        cur_one = self.db.select_diff_one(w7lib)
+        res = cur_one.fetchall()
+         
+        for item in res:
+            fsplit = re.split('\(', item['funcname'], 1, 0)
+            
+            cur_two = self.db.select_diff_two(w8lib,item['sigpattern'],fsplit[0])
+            hitcount_two = cur_two.fetchone()
+             
+            if (hitcount_two):
+                if item['co'] != hitcount_two['co']:
+                    print "%s;%s;%s;%s" % (fsplit[0],item['sigpattern'],item['co'],hitcount_two['co'])
+
+            elif (self.db.select_function(fsplit[0], w8lib)):
+                print "%s;%s;%s;0" % (fsplit[0],item['sigpattern'],item['co'])
+
+    def library_info(self,libid):    
         cur_all = self.db.select_lib_all(libid)
         print "Libname;Functionname;Sigpattern;Line_Offset"
         for item in cur_all:
