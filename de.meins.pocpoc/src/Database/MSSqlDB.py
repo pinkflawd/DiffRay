@@ -105,7 +105,7 @@ class MSSqlDB(object):
             cursor = self.localdb.cursor()
             cursor.execute(update_string)
         except:
-            raise DatabaseError, "An Error occurred when executing a delete."
+            raise DatabaseError, "An Error occurred when executing an update."
         else:
             self.localdb.commit()
 
@@ -197,6 +197,10 @@ class MSSqlDB(object):
             insert_string = "insert into [Poc].[dbo].[t_signature] (sigpattern) values ('%s')" % sig
             self.insert(insert_string)
         self.log.info("Signatures inserted/updated")
+        
+    def update_mappings(self, sig, map):
+        insert_string = "update [Poc].[dbo].[t_signature] set mapping='%s' where sigpattern = '%s'" % (sig,map)
+        self.update(insert_string)
         
         
     def insert_hit(self, libid, funcid, sigpattern, line_offset):
@@ -290,6 +294,7 @@ class MSSqlDB(object):
         
         create_string = """create table t_signature (
                         sigpattern varchar(100) primary key not null,
+                        mapping varchar(100)
                         )"""
         self.insert(create_string)
         

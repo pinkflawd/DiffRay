@@ -42,6 +42,7 @@ def main():
     parser.add_option("-f", "--flushall", action="store_true", dest="flush", help="Flush the Database Scheme")
     parser.add_option("-c", "--create-scheme", action="store_true", dest="createall", help="(Re)Create Database Scheme (same as flushall option)")
     parser.add_option("-u", "--update-sigs", action="store_true", dest="updatesigs", help="Flushes the signature table and re-reads the signatures.conf for update")
+    parser.add_option("-m", "--print-mappings", action="store_true", dest="printmappings", help="Prints the Mappings in the signature table")
     
     ### Database
     parser.add_option("-b", "--backend", dest="database", help="Database backend to use, currently supported: sqlite (default), mssql - use mssql/MSSQL or sqlite/SQLITE !!!")
@@ -52,7 +53,7 @@ def main():
     parser.add_option("-i", "--diff", action="store_true", dest="diff", help="Diffing of two libraries, needs arguments lib1 and lib2, lib1 should be win7 as difflib, lib2 for win8 as baselib")
     parser.add_option("-1", "--lib_1", dest="lib_one", help="Difflib for diffing - Win7 goes here")
     parser.add_option("-2", "--lib_2", dest="lib_two", help="Baselib for diffing - Win8 goes here")
-    parser.add_option("-e", "--diff_byname", dest="diffbyname", help="Diff two libs by name, provide a libname like advapi32.c. CAUTION: Tool aborts when more than 2 libs are matched and DOES NOT VERIFY if the two difflibs belong together.")
+    parser.add_option("-e", "--diff_byname", dest="diffbyname", help="Diff two libs by name, two-sided, provide a libname like advapi32.c. CAUTION: Tool aborts when more than 2 libs are matched and DOES NOT VERIFY if the two difflibs belong together.")
     
     (options, args) = parser.parse_args()
     
@@ -134,9 +135,26 @@ def main():
                     signatures.append(sig)
                 db.insert_signatures(signatures)
                 sigfile.close()
+            
+            try:
+                sigmapping = open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'conf', 'sig_mapping.conf'))
+            except:
+                log.error("Something went wrong when accessing the sig_mapping.conf.")
+            else:
+                for line in sigmapping:
+                    map = re.sub('\'','', line.rstrip(),0)
+                    arr = re.split('=', map, 1)
+                    db.update_mappings(arr[0], arr[1])
+                sigmapping.close()
         
         except:
             log.error("Something went wrong when updating the signatures in DB.")
+
+    ### OPTION printmappings shows all the mappings that exist for sigs in the DB ###
+    
+    elif options.printmappings is not None:
+        info = Diffing.Info.Info(database)
+        info.print_mappings()
         
     ### OPTION search_libs gets you the lib IDs to a given libname ###
     

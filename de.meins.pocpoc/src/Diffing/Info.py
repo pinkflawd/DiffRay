@@ -127,4 +127,10 @@ class Info(object):
         for item in cur_all:
             print "%s;%s;%s;%s" % (item['libname'],item['funcname'],item['sigpattern'],item['line_offset'])
 
-        
+    def print_mappings(self):
+        cur_all = self.db.select_mappings()
+        print "Sigpattern;Mapping"
+        for item in cur_all:
+            print "%s;%s" % (item['sigpattern'],item['mapping'])
+            
+            

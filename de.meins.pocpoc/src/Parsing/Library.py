@@ -94,11 +94,15 @@ class Library(object):
             self.log.info("Parsing...... pls wait")
             
             for line in self.file:
-                if f_off.search(line) and not semico.search(line):
+                if f_off.search(line) and not semico.search(line): ###### FIND FUNCTIONS WITHOUT CALLING CONV.
+                    
+                    
+                    ###### PUT THIS SOMEWHERE ELSE
                     
                     if function is not None:
                         # update linecount to database
                         function.set_linecount(linecount)
+                   
                    
                     # create new function (object) with linecount 0
                     function = Function.Function(self.id, line.rstrip(), 0, self.backend)
@@ -106,9 +110,15 @@ class Library(object):
                     
                 elif function is not None and not comment.search(line):                      #inside a function and not a comment line
       
+                    ### here: check if line worth scanning
+                    if (len(''.join(line.split())) < 10):
+                        print "%s -- %s" % (len(line.rstrip()), line.rstrip())
+                    
                     for sig in signatures:
                         sigscan = re.compile(sig)
                         if sigscan.search(line):
+                            ### here: check for mapping, if exists, replace sig
+                            print "%s -- %i --- %s" % (sig, len(line.rstrip()), line.rstrip())
                             function.signature_found(function.libid,function.id,sig,linecount+1)
                                             
                     # every line: count++
@@ -123,6 +133,8 @@ class Library(object):
                 function.set_linecount(linecount)
             else:
                 self.log.error("No Functions identified, check your decompiled library!")
+            
+            self.file.close()
  
     def parse_lstfile(self):
         
@@ -174,6 +186,7 @@ class Library(object):
             
                     # dont forget last function ;)
             function.set_linecount(linecount)
+            self.file.close()
         
         
     def flush_me(self):

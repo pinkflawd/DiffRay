@@ -78,7 +78,7 @@ class SQLiteDB(object):
             cursor = self.localdb.cursor()
             cursor.execute(update_string)
         except:
-            raise DatabaseError, "An Error occurred when executing a delete."
+            raise DatabaseError, "An Error occurred when executing an update."
         else:
             self.localdb.commit()
         
@@ -163,6 +163,10 @@ class SQLiteDB(object):
             self.insert(insert_string)
         self.log.info("Signatures inserted/updated")
         
+    def update_mappings(self, sig, map):
+        insert_string = "update t_signature set mapping='%s' where sigpattern = '%s'" % (map, sig)
+        self.update(insert_string)
+        
     def insert_hit(self, libid, funcid, sigpattern, line_offset):
         insert_string = "insert into t_hit (libid, funcid, sigpattern, line_offset) values (%i, %i, '%s', %i)" % (libid, funcid, sigpattern, line_offset)
         self.insert(insert_string)
@@ -224,6 +228,11 @@ class SQLiteDB(object):
         select_string = "select os from t_library where id = %i" % libid
         return self.select(select_string)
         
+    # get mappings in signature table
+    def select_mappings(self):
+        select_string = "select * from t_signature where mapping not null"
+        return self.select(select_string)
+    
     ###########################
     # Scheme Re-Creation      #
     # t_library               #
@@ -253,7 +262,8 @@ class SQLiteDB(object):
         self.insert(create_string)
                
         create_string = """create table t_signature (
-                        sigpattern text primary key
+                        sigpattern text primary key,
+                        mapping text
                         )"""
         self.insert(create_string)
         
