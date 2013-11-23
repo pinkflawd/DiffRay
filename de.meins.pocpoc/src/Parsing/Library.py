@@ -58,8 +58,6 @@ class Library(object):
             self.filemd5 = hashlib.md5(data).hexdigest()
             self.file.close()
             
-            #xtmp = os.path.exists('c:\\aa\\aaa.c')
-
             if (database == "mssql"):
                 import Database.MSSqlDB
                 self.db = Database.MSSqlDB.MSSqlDB()
@@ -75,16 +73,19 @@ class Library(object):
         
     def parse_cfile(self):
         
-        # Regexes to scan for function offsets
+        # Regexes to scan for whatever needed
         f_off = re.compile('^[^\/|\s|#].+(stdcall|cdecl|thiscall|fastcall|userpurge|usercall).+[^\)].*$')   
         semico = re.compile('[;|=]')
         comment = re.compile('^[\/\/|#]')
+        brackon = re.compile('{')
+        brackoff = re.compile('}')
 
         linecount = 0
+        brackflag = 0
         function = None
         
         try:
-            self.file = open(self.path) # file handle doesnt survive the method switch?!
+            self.file = open(self.path)
         except:
             raise FileError, "Can't open file to parse. At parse_cfile."
         
@@ -94,43 +95,47 @@ class Library(object):
             self.log.info("Parsing...... pls wait")
             
             for line in self.file:
-                if f_off.search(line) and not semico.search(line): ###### FIND FUNCTIONS WITHOUT CALLING CONV.
-                    
-                    
-                    ###### PUT THIS SOMEWHERE ELSE
-                    
-                    if function is not None:
-                        # update linecount to database
-                        function.set_linecount(linecount)
-                   
-                   
+                if f_off.search(line) and brackflag <= 0 and not semico.search(line): ###### FIND FUNCTIONS WITHOUT CALLING CONV.
+
                     # create new function (object) with linecount 0
                     function = Function.Function(self.id, line.rstrip(), 0, self.backend)
                     linecount = 0
+                    brackflag = 0
                     
                 elif function is not None and not comment.search(line):                      #inside a function and not a comment line
       
-                    ### here: check if line worth scanning
-                    if (len(''.join(line.split())) < 10):
-                        print "%s -- %s" % (len(line.rstrip()), line.rstrip())
+                    ### here: check if line worth scanning: enouth characters to fit a signature :P
+                    rline = line.replace(' ','')
                     
-                    for sig in signatures:
-                        sigscan = re.compile(sig)
-                        if sigscan.search(line):
-                            ### here: check for mapping, if exists, replace sig
-                            print "%s -- %i --- %s" % (sig, len(line.rstrip()), line.rstrip())
-                            function.signature_found(function.libid,function.id,sig,linecount+1)
-                                            
-                    # every line: count++
-                    linecount = linecount+1
+                    if (len(rline) > 11):
+                        for sig in signatures:
+                            sigscan = re.compile(sig['sigpattern'])
+                            if sigscan.search(line):
+                                ### here: check for mapping, if exists, replace sig
+                                if (sig['mapping'] is not None):
+                                    function.signature_found(function.libid,function.id,sig['mapping'],linecount+1)
+                                    print "MAPPING found %s in %s" % (sig['mapping'], line.rstrip())
+                                else:
+                                    function.signature_found(function.libid,function.id,sig['sigpattern'],linecount+1)
+                    
+                    if (brackon.search(rline)):
+                        brackflag += 1
+
+                    if (brackoff.search(rline)):
+                        brackflag -= 1
+                        if (brackflag == 0):
+                            function.set_linecount(linecount+1)
+                            function = None
+                            
+                    if function is not None:                  
+                        # every line: count++
+                        linecount = linecount+1
                     
                 else:
                     pass
             
-            # dont forget last function ;)
-            # when there is no last function at all something went wrong - check c/lst file
             if function is not None:
-                function.set_linecount(linecount)
+                function.set_linecount(linecount+1)
             else:
                 self.log.error("No Functions identified, check your decompiled library!")
             
@@ -158,7 +163,6 @@ class Library(object):
             self.log.info("Parsing...... pls wait")
             
             for line in self.file:
-                #if (f_off.search(line) or (f_off2.search(line) and not endp.search(line)) or f_off3.search(line)):
                 if (f_off.search(line) or f_off3.search(line)):
                 
                     if function is not None:

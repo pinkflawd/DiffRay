@@ -29,7 +29,7 @@ class SQLiteDB(object):
     
     def __init__(self):
         try:
-            self.localdb = sqlite3.connect(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..','..', 'data', 'pocpoc2.sqlite'))
+            self.localdb = sqlite3.connect(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..','..', 'data', 'dbdbdb.sqlite'))
             # set row factory to Row type for accessing rows as dictionaries
             self.localdb.row_factory = sqlite3.Row
         except:
@@ -106,12 +106,13 @@ class SQLiteDB(object):
         return id
 
     def select_signatures(self):
-        select_string = "select sigpattern from t_signature"
-        res = self.select(select_string)
-        signatures = []
-        for sig in res:
-            signatures.append(sig[0])
-        return signatures
+        select_string = "select * from t_signature"
+        res = self.select(select_string).fetchall()
+        #signatures = []
+        #for sig in res:
+        #    signatures.append(sig[0])
+        #return signatures
+        return res
             
     def flush_all(self):
 
@@ -231,7 +232,7 @@ class SQLiteDB(object):
     # get mappings in signature table
     def select_mappings(self):
         select_string = "select * from t_signature where mapping not null"
-        return self.select(select_string)
+        return self.select(select_string).fetchall()
     
     ###########################
     # Scheme Re-Creation      #

@@ -262,6 +262,12 @@ class MSSqlDB(object):
         select_string = "select os from [Poc].[dbo].[t_library] where id = %i" % libid
         return self.select(select_string)
     
+    # get mappings in signature table
+    def select_mappings(self):
+        select_string = "select * from [Poc].[dbo].[t_signature] where mapping not null"
+        return self.select(select_string)
+    
+    
     ###########################
     # Scheme Re-Creation      #
     # t_library               #
