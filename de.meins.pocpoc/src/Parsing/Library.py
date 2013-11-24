@@ -95,6 +95,7 @@ class Library(object):
             self.log.info("Parsing...... pls wait")
             
             for line in self.file:
+                
                 if f_off.search(line) and brackflag <= 0 and not semico.search(line): ###### FIND FUNCTIONS WITHOUT CALLING CONV.
 
                     # create new function (object) with linecount 0
@@ -106,6 +107,9 @@ class Library(object):
       
                     ### here: check if line worth scanning: enouth characters to fit a signature :P
                     rline = line.replace(' ','')
+                    # cut off comments
+                    blubb = rline.partition('//')
+                    rline = blubb[0]
                     
                     if (len(rline) > 11):
                         for sig in signatures:
@@ -114,7 +118,7 @@ class Library(object):
                                 ### here: check for mapping, if exists, replace sig
                                 if (sig['mapping'] is not None):
                                     function.signature_found(function.libid,function.id,sig['mapping'],linecount+1)
-                                    print "MAPPING found %s in %s" % (sig['mapping'], line.rstrip())
+                                    #print "MAPPING found %s in %s" % (sig['mapping'], line.rstrip())
                                 else:
                                     function.signature_found(function.libid,function.id,sig['sigpattern'],linecount+1)
                     
@@ -125,8 +129,9 @@ class Library(object):
                         brackflag -= 1
                         if (brackflag == 0):
                             function.set_linecount(linecount+1)
+                            print "ending func %s" % function.funcname
                             function = None
-                            
+                                                        
                     if function is not None:                  
                         # every line: count++
                         linecount = linecount+1
@@ -135,9 +140,12 @@ class Library(object):
                     pass
             
             if function is not None:
-                function.set_linecount(linecount+1)
+                self.log.error("Ooops somethings wrong with that .c file!")
+                print function.funcname
+                print function.linecount
+                print brackflag
             else:
-                self.log.error("No Functions identified, check your decompiled library!")
+                self.log.error("Success.")
             
             self.file.close()
  
