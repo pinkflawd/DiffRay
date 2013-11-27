@@ -96,16 +96,19 @@ class Library(object):
             
             for line in self.file:
                 
-                if f_off.search(line) and brackflag <= 0 and not semico.search(line): ###### FIND FUNCTIONS WITHOUT CALLING CONV.
+                if f_off.search(line) and not semico.search(line): ###### FIND FUNCTIONS WITHOUT CALLING CONV.
 
                     # create new function (object) with linecount 0
+                    if function is not None:
+                        self.log.error("Something wrong with the brackets? %s" % function.funcname)
+                        print brackflag
                     function = Function.Function(self.id, line.rstrip(), 0, self.backend)
                     linecount = 0
                     brackflag = 0
                     
                 elif function is not None and not comment.search(line):                      #inside a function and not a comment line
       
-                    ### here: check if line worth scanning: enouth characters to fit a signature :P
+                    ### here: check if line worth scanning: enough characters to fit a signature :P
                     rline = line.replace(' ','')
                     # cut off comments
                     blubb = rline.partition('//')
@@ -129,7 +132,7 @@ class Library(object):
                         brackflag -= 1
                         if (brackflag == 0):
                             function.set_linecount(linecount+1)
-                            print "ending func %s" % function.funcname
+                            #print "ending func %s" % function.funcname
                             function = None
                                                         
                     if function is not None:                  
@@ -140,14 +143,14 @@ class Library(object):
                     pass
             
             if function is not None:
-                self.log.error("Ooops somethings wrong with that .c file!")
-                print function.funcname
-                print function.linecount
-                print brackflag
+                self.log.error("Something wrong with the brackets? %s" % function.funcname)
             else:
-                self.log.error("Success.")
+                self.log.info("Success.")
             
             self.file.close()
+ 
+ 
+    ### DEPRECATED ###
  
     def parse_lstfile(self):
         
