@@ -132,12 +132,9 @@ class MSSqlDB(object):
         return self.select_id(select_string)
 
     def select_signatures(self):
-        select_string = "select sigpattern from [Poc].[dbo].[t_signature]"
+        select_string = "select * from [Poc].[dbo].[t_signature]"
         res = self.select(select_string)
-        signatures = []
-        for sig in res:
-            signatures.append(sig['sigpattern'])
-        return signatures
+        return res
     
     # FLUSHING operations
     
