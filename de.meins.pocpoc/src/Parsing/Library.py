@@ -91,7 +91,6 @@ class Library(object):
         
         else:
             
-            signatures = self.db.select_signatures()
             self.log.info("Parsing...... pls wait")
             
             for line in self.file:
@@ -115,15 +114,18 @@ class Library(object):
                     rline = blubb[0]
                     
                     if (len(rline) > 11):
+                        signatures = self.db.select_signatures()
                         for sig in signatures:
                             sigscan = re.compile(sig['sigpattern'])
                             if sigscan.search(line):
+                                print sig['sigpattern']
                                 ### here: check for mapping, if exists, replace sig
                                 if (sig['mapping'] is not None):
                                     function.signature_found(function.libid,function.id,sig['mapping'],linecount+1)
                                     #print "MAPPING found %s in %s" % (sig['mapping'], line.rstrip())
                                 else:
                                     function.signature_found(function.libid,function.id,sig['sigpattern'],linecount+1)
+                        signatures.close()
                     
                     if (brackon.search(rline)):
                         brackflag += 1
