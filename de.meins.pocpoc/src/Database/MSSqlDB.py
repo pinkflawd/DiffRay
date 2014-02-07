@@ -5,7 +5,7 @@ Created on 06.09.2013
 '''
 
 import ConfigParser
-import pymssql
+import pyodbc
 import os.path
 from Exceptions import DatabaseError, FileError
 import logging.config
@@ -40,7 +40,8 @@ class MSSqlDB(object):
             dbname = conf.get('Database', 'dbname')
             
         try:
-            self.localdb = pymssql.connect(host=dbhost, user=dbuser, password=dbpassword, database=dbname, as_dict=True)  # @UndefinedVariable
+            print dbhost, dbuser, dbpassword, dbname
+            self.localdb = pyodbc.connect("DRIVER={SQL Server};SERVER=%s;DATABASE=%s;UID=%s;PWD=%s" % (dbhost, dbname, dbuser, dbpassword))  # @UndefinedVariable
         except:
             raise DatabaseError, "Connection to DB cant be established."
 
