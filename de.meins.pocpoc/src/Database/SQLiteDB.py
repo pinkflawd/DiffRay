@@ -107,7 +107,8 @@ class SQLiteDB(object):
 
     def select_signatures(self):
         select_string = "select * from t_signature"
-        res = self.select(select_string).fetchall()
+        res = self.select(select_string)
+        #.fetchall()
         #signatures = []
         #for sig in res:
         #    signatures.append(sig[0])

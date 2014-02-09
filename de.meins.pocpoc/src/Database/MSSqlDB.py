@@ -40,7 +40,6 @@ class MSSqlDB(object):
             dbname = conf.get('Database', 'dbname')
             
         try:
-            print dbhost, dbuser, dbpassword, dbname
             self.localdb = pyodbc.connect("DRIVER={SQL Server};SERVER=%s;DATABASE=%s;UID=%s;PWD=%s" % (dbhost, dbname, dbuser, dbpassword))  # @UndefinedVariable
         except:
             raise DatabaseError, "Connection to DB cant be established."

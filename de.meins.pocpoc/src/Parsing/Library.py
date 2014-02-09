@@ -126,6 +126,7 @@ class Library(object):
                                 else:
                                     function.signature_found(function.libid,function.id,sig['sigpattern'],linecount+1)
                         signatures.close()
+                        #print "here"
                     
                     if (brackon.search(rline)):
                         brackflag += 1
