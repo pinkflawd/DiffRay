@@ -11,6 +11,7 @@ import sys
 import logging.config
 import re
 import os
+import traceback
 
 def main():
     
@@ -60,11 +61,11 @@ def main():
     ### OPTION backend ###
     
     if (options.database == "mssql" or options.database == "MSSQL"):
-        database = "mssql"
+        database = "MSSQL"
         import Database.MSSqlDB
         db = Database.MSSqlDB.MSSqlDB()
     else:
-        database = "sqlite"
+        database = "SQLITE"
         import Database.SQLiteDB
         db = Database.SQLiteDB.SQLiteDB()
 
@@ -101,7 +102,9 @@ def main():
                     log.info("Nothing to parse here, continue.")
 
         except:
+            type, value, tb = sys.exc_info()
             log.error("Something went wrong when parsing a library: %s" % (sys.exc_info()[1]))
+            traceback.print_exception(type, value, tb, limit=10, file=sys.stdout)
             log.error("If MSSQL, are the access credentials right? Did you set the right permissions on the DB? Did you perform a create_all on mssql or sqlite?")
         
         

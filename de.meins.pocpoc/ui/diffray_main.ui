@@ -962,7 +962,7 @@
       <string>Library Files .dll</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_9">
+    <widget class="QPushButton" name="button_generateit">
      <property name="geometry">
       <rect>
        <x>510</x>
@@ -1596,12 +1596,12 @@
        <rect>
         <x>20</x>
         <y>60</y>
-        <width>111</width>
+        <width>141</width>
         <height>17</height>
        </rect>
       </property>
       <property name="text">
-       <string>LST</string>
+       <string>LST (deprecated)</string>
       </property>
      </widget>
     </widget>
@@ -2814,6 +2814,19 @@
      </property>
      <property name="text">
       <string>CONFIGURATION DIALOG</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="button_connect">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>60</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>CONNECT</string>
      </property>
     </widget>
    </widget>

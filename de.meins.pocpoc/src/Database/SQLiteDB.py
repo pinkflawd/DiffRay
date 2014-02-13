@@ -63,6 +63,7 @@ class SQLiteDB(object):
             raise DatabaseError, "An Error occurred when executing an insert."
         else:
             self.localdb.commit()
+            cursor.close()
             
     def delete(self, delete_string):
         try:
@@ -72,6 +73,7 @@ class SQLiteDB(object):
             raise DatabaseError, "An Error occurred when executing a delete."
         else:
             self.localdb.commit()
+            cursor.close()
             
     def update(self, update_string):
         try:
@@ -81,6 +83,7 @@ class SQLiteDB(object):
             raise DatabaseError, "An Error occurred when executing an update."
         else:
             self.localdb.commit()
+            cursor.close()
         
 
     ###########################
@@ -90,6 +93,7 @@ class SQLiteDB(object):
     def select_id(self, select_string):
         cur = self.select(select_string)
         row = cur.fetchone()
+        cur.close()
         if row:
             return row[0]
         else:
@@ -107,7 +111,7 @@ class SQLiteDB(object):
 
     def select_signatures(self):
         select_string = "select * from t_signature"
-        res = self.select(select_string)
+        res = self.select(select_string).fetchall()
         #.fetchall()
         #signatures = []
         #for sig in res:

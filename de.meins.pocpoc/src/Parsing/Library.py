@@ -58,14 +58,14 @@ class Library(object):
             self.filemd5 = hashlib.md5(data).hexdigest()
             self.file.close()
             
-            if (database == "mssql"):
+            if (database == "MSSQL"):
                 import Database.MSSqlDB
                 self.db = Database.MSSqlDB.MSSqlDB()
-                self.backend = "mssql"
+                self.backend = "MSSQL"
             else:
                 import Database.SQLiteDB
                 self.db = Database.SQLiteDB.SQLiteDB()
-                self.backend = "sqlite"
+                self.backend = "SQLITE"
                 
             self.existant = self.db.insert_library(self.filemd5,self.path,self.os,self.ftype)
             self.id = self.db.select_libid(self.filemd5)
@@ -109,23 +109,27 @@ class Library(object):
       
                     ### here: check if line worth scanning: enough characters to fit a signature :P
                     rline = line.replace(' ','')
+                    
                     # cut off comments
                     blubb = rline.partition('//')
                     rline = blubb[0]
                     
                     if (len(rline) > 11):
                         signatures = self.db.select_signatures()
+                        
                         for sig in signatures:
-                            sigscan = re.compile(sig['sigpattern'])
+                            sigscan = re.compile(sig[0])
+                            
                             if sigscan.search(line):
-                                print sig['sigpattern']
+                                #print sig[0]
+                                
                                 ### here: check for mapping, if exists, replace sig
-                                if (sig['mapping'] is not None):
-                                    function.signature_found(function.libid,function.id,sig['mapping'],linecount+1)
+                                if (sig[1] is not None):
+                                    function.signature_found(function.libid,function.id,sig[1],linecount+1)
                                     #print "MAPPING found %s in %s" % (sig['mapping'], line.rstrip())
                                 else:
-                                    function.signature_found(function.libid,function.id,sig['sigpattern'],linecount+1)
-                        signatures.close()
+                                    function.signature_found(function.libid,function.id,sig[0],linecount+1)
+                        #signatures.close()
                         #print "here"
                     
                     if (brackon.search(rline)):

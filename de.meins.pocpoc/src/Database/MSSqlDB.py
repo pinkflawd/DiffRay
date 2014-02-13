@@ -5,7 +5,7 @@ Created on 06.09.2013
 '''
 
 import ConfigParser
-import pyodbc
+import pymssql
 import os.path
 from Exceptions import DatabaseError, FileError
 import logging.config
@@ -40,7 +40,7 @@ class MSSqlDB(object):
             dbname = conf.get('Database', 'dbname')
             
         try:
-            self.localdb = pyodbc.connect("DRIVER={SQL Server};SERVER=%s;DATABASE=%s;UID=%s;PWD=%s" % (dbhost, dbname, dbuser, dbpassword))  # @UndefinedVariable
+            self.localdb = pymssql.connect(host=dbhost, user=dbuser, password=dbpassword, database=dbname, as_dict=True)  # @UndefinedVariable
         except:
             raise DatabaseError, "Connection to DB cant be established."
 
@@ -196,7 +196,7 @@ class MSSqlDB(object):
         self.log.info("Signatures inserted/updated")
         
     def update_mappings(self, sig, map):
-        insert_string = "update [Poc].[dbo].[t_signature] set mapping='%s' where sigpattern = '%s'" % (sig,map)
+        insert_string = "update [Poc].[dbo].[t_signature] set mapping='%s' where sigpattern = '%s'" % (map,sig)
         self.update(insert_string)
         
         
