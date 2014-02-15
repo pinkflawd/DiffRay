@@ -438,7 +438,7 @@
       <x>10</x>
       <y>10</y>
       <width>661</width>
-      <height>211</height>
+      <height>131</height>
      </rect>
     </property>
     <property name="palette">
@@ -865,108 +865,77 @@
      <bool>true</bool>
     </property>
     <property name="title">
-     <string>MOTI STUFF</string>
+     <string>IDB2C - C-File Generation</string>
     </property>
     <property name="flat">
      <bool>true</bool>
     </property>
-    <widget class="QLineEdit" name="lineEdit_2">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>50</y>
-       <width>521</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_6">
-     <property name="geometry">
-      <rect>
-       <x>550</x>
-       <y>50</y>
-       <width>91</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>CHOOSE PATH</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_7">
-     <property name="geometry">
-      <rect>
-       <x>550</x>
-       <y>100</y>
-       <width>91</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>CHOOSE PATH</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit_3">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>100</y>
-       <width>521</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_10">
+    <widget class="QLineEdit" name="lineedit_idb2c">
      <property name="geometry">
       <rect>
        <x>20</x>
        <y>30</y>
-       <width>46</width>
-       <height>13</height>
+       <width>621</width>
+       <height>31</height>
       </rect>
      </property>
-     <property name="text">
-      <string>IDA Pro</string>
+     <property name="palette">
+      <palette>
+       <active>
+        <colorrole role="Base">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>164</red>
+           <green>224</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </active>
+       <inactive>
+        <colorrole role="Base">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>164</red>
+           <green>224</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </inactive>
+       <disabled>
+        <colorrole role="Base">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>164</red>
+           <green>224</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </disabled>
+      </palette>
      </property>
-    </widget>
-    <widget class="QLabel" name="label_11">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>80</y>
-       <width>101</width>
-       <height>16</height>
-      </rect>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
-     <property name="text">
-      <string>Library Files .dll</string>
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <property name="frame">
+      <bool>false</bool>
+     </property>
+     <property name="readOnly">
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QPushButton" name="button_generateit">
      <property name="geometry">
       <rect>
        <x>510</x>
-       <y>140</y>
+       <y>70</y>
        <width>131</width>
        <height>51</height>
       </rect>
@@ -980,9 +949,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>240</y>
+      <y>190</y>
       <width>661</width>
-      <height>211</height>
+      <height>261</height>
      </rect>
     </property>
     <property name="palette">
@@ -1418,7 +1387,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>30</y>
+       <y>80</y>
        <width>521</width>
        <height>31</height>
       </rect>
@@ -1433,7 +1402,7 @@
      <property name="geometry">
       <rect>
        <x>550</x>
-       <y>20</y>
+       <y>70</y>
        <width>101</width>
        <height>21</height>
       </rect>
@@ -1451,7 +1420,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>80</y>
+       <y>140</y>
        <width>201</width>
        <height>101</height>
       </rect>
@@ -1562,7 +1531,7 @@
      <property name="geometry">
       <rect>
        <x>240</x>
-       <y>80</y>
+       <y>140</y>
        <width>201</width>
        <height>101</height>
       </rect>
@@ -1609,7 +1578,7 @@
      <property name="geometry">
       <rect>
        <x>470</x>
-       <y>90</y>
+       <y>150</y>
        <width>111</width>
        <height>21</height>
       </rect>
@@ -1627,7 +1596,7 @@
      <property name="geometry">
       <rect>
        <x>470</x>
-       <y>120</y>
+       <y>180</y>
        <width>171</width>
        <height>61</height>
       </rect>
@@ -1640,7 +1609,7 @@
      <property name="geometry">
       <rect>
        <x>550</x>
-       <y>50</y>
+       <y>100</y>
        <width>101</width>
        <height>21</height>
       </rect>
@@ -1652,6 +1621,34 @@
      </property>
      <property name="text">
       <string>CHOOSE FILE</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineedit_python">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>521</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="button_python">
+     <property name="geometry">
+      <rect>
+       <x>550</x>
+       <y>30</y>
+       <width>101</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>PYTHON PATH</string>
      </property>
     </widget>
    </widget>

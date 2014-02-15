@@ -16,6 +16,8 @@ import Database.SQLiteDB
 import logging.config
 import re
 import traceback
+import subprocess
+from subprocess import Popen, CREATE_NEW_CONSOLE
 
 
 class DiffRay_Main(QtGui.QMainWindow):
@@ -31,9 +33,19 @@ class DiffRay_Main(QtGui.QMainWindow):
         # IDB2C
         
         self.button_generateit = self.main_ui.button_generateit
-        self.connect(self.button_generateit, QtCore.SIGNAL('clicked()'), self.generateit)        
+        #self.button_idb2c = self.main_ui.button_idb2c
+        self.lineedit_idb2c = self.main_ui.lineedit_idb2c
+        self.lineedit_idb2c.setText(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'util', 'IDB2C.exe'))
+        self.lineedit_idb2c.setReadOnly(1)
+                
+        self.connect(self.button_generateit, QtCore.SIGNAL('clicked()'), self.generateit)    
+        #self.connect(self.button_idb2c, QtCore.SIGNAL('clicked()'), self.setIdb2cPath)    
         
         # PARSING
+        self.lineedit_python = self.main_ui.lineedit_python
+        self.lineedit_python.setText('C:\\Python27\\python.exe')
+        self.button_python = self.main_ui.button_python
+        
         self.lineedit_parsing = self.main_ui.lineedit_parsing
         self.button_chp_parsing = self.main_ui.button_chp_parsing
         self.button_chf_parsing = self.main_ui.button_chf_parsing
@@ -44,6 +56,7 @@ class DiffRay_Main(QtGui.QMainWindow):
         self.button_parseit = self.main_ui.button_parseit
         self.checkbox_flush = self.main_ui.checkbox_flush
         
+        self.connect(self.button_python, QtCore.SIGNAL('clicked()'), self.showPythonDialog)
         self.connect(self.button_chf_parsing, QtCore.SIGNAL('clicked()'), self.showFileDialog)
         self.connect(self.button_chp_parsing, QtCore.SIGNAL('clicked()'), self.showDirDialog)
         self.connect(self.button_parseit, QtCore.SIGNAL('clicked()'), self.parseit)
@@ -81,6 +94,14 @@ class DiffRay_Main(QtGui.QMainWindow):
         dirname = QtGui.QFileDialog.getExistingDirectory(self, 'Open directory', 'C:\\')
         self.lineedit_parsing.setText(dirname)
         
+    def setIdb2cPath(self):
+        idb2c = QtGui.QFileDialog.getOpenFileName(self, 'Open file', 'C:\\')
+        self.lineedit_idb2c.setText(idb2c)
+        
+    def showPythonDialog(self):
+        pythonp = QtGui.QFileDialog.getOpenFileName(self, 'Open file', 'C:\\')
+        self.lineedit_python.setText(pythonp)
+
     def showConfigDialog(self):
         dialog = Gui.Settings.Settings()
         dialog.setAcceptDrops(QtCore.Qt.WA_DeleteOnClose)
@@ -140,12 +161,14 @@ class DiffRay_Main(QtGui.QMainWindow):
             self.textbrowser_logging.append("Connect to a DB!")
             
     def generateit(self):
-        print "here"
-        pass
+        try:                        
+            os.system(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'util', 'IDB2C.exe'))
+        except:
+            self.textbrowser_logging.append("IDB2C.exe is not where it should be! - put it into the util dir")
 
     def parseit(self):
         
-        if (self.db is not None):
+        if (self.db is not None and self.lineedit_python.text().length() > 0):
             try:
                 
                 lib_files = []
@@ -165,6 +188,19 @@ class DiffRay_Main(QtGui.QMainWindow):
                     ftype = 'C'
                 else:
                     ftype = 'LST'
+                    
+                try:
+                    cmd = str(self.lineedit_python.text()).replace('\\','\\\\')
+                    diffray = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'Main.py')
+                    
+                    os.system("start %s %s %s" % (cmd, diffray, '-p C:\\Multiscanner\\malware\\MotiPoc\\Win7C\\aaclient.c -t C -o WIN7'))
+                    
+#                    subprocess.call(['C:\\Windows\\system32\\cmd.exe', cmd, diffray, '-h'], creationflags = subprocess.CREATE_NEW_CONSOLE)
+                    
+                    #Popen([cmd, diffray, '-h'], shell=True)
+                    
+                except:
+                    self.textbrowser_logging.append("Something went wrong when parsing!")
     
                 for lib_file in lib_files:  
                     self.textbrowser_logging.append("Parsing %s for %s" % (lib_file, opsys))
@@ -192,7 +228,7 @@ class DiffRay_Main(QtGui.QMainWindow):
                 traceback.print_exception(type, value, tb, limit=10, file=sys.stdout)
                 self.textbrowser_logging.append("If MSSQL, are the access credentials right? Did you set the right permissions on the DB? Did you actually create a DB on mssql or sqlite?")
         else:
-            self.textbrowser_logging.append("Connect to a DB!")
+            self.textbrowser_logging.append("Connect to a DB! OR python path wrong.")
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
