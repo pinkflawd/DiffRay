@@ -33,7 +33,7 @@ class Function(object):
             raise ParameterError, "Linecount exceeds int range - weiiird should never happen."
         
         # might throw exception - theres no throws keyword :/
-        if (database == "mssql"):
+        if (database == "MSSQL"):
             import Database.MSSqlDB
             self.db = Database.MSSqlDB.MSSqlDB()
         else:

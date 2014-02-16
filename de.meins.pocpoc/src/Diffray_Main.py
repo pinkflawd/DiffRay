@@ -189,9 +189,9 @@ class DiffRay_Main(QtGui.QMainWindow):
                     diffray = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'Main.py')
                     
                     if os.path.isdir(path):
-                        os.system("start %s %s %s %s %s %s %s %s" % (cmd, diffray, '-d', path, '-t', ftype, '-o', opsys))
+                        os.system("start %s %s %s %s %s %s %s %s %s %s" % (cmd, diffray, '-d', path, '-t', ftype, '-o', opsys, '-b', self.backend))
                     elif os.path.exists(path):
-                        os.system("start %s %s %s %s %s %s %s %s" % (cmd, diffray, '-p', path, '-t', ftype, '-o', opsys))
+                        os.system("start %s %s %s %s %s %s %s %s %s %s" % (cmd, diffray, '-p', path, '-t', ftype, '-o', opsys, '-b', self.backend))
                     else:
                         self.textbrowser_logging.append("Nothing to parse here. Maybe invalid path?")
                 except:
