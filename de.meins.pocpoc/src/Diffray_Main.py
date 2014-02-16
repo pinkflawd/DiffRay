@@ -170,15 +170,10 @@ class DiffRay_Main(QtGui.QMainWindow):
         
         if (self.db is not None and self.lineedit_python.text().length() > 0):
             try:
-                
-                lib_files = []
-                path = str(self.lineedit_parsing.text())
-                
-                if os.path.isdir(path):
-                    lib_files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path,f))]
-                elif os.path.exists(path):
-                    lib_files.append(path)
-                    
+
+                path = str(self.lineedit_parsing.text()).replace('\\','\\\\')
+                path = path.replace('/', '\\\\')
+    
                 if (self.radio_win7.isChecked()):
                     opsys = 'WIN7'
                 else:
@@ -193,35 +188,18 @@ class DiffRay_Main(QtGui.QMainWindow):
                     cmd = str(self.lineedit_python.text()).replace('\\','\\\\')
                     diffray = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'Main.py')
                     
-                    os.system("start %s %s %s" % (cmd, diffray, '-p C:\\Multiscanner\\malware\\MotiPoc\\Win7C\\aaclient.c -t C -o WIN7'))
-                    
-#                    subprocess.call(['C:\\Windows\\system32\\cmd.exe', cmd, diffray, '-h'], creationflags = subprocess.CREATE_NEW_CONSOLE)
-                    
-                    #Popen([cmd, diffray, '-h'], shell=True)
-                    
-                except:
-                    self.textbrowser_logging.append("Something went wrong when parsing!")
-    
-                for lib_file in lib_files:  
-                    self.textbrowser_logging.append("Parsing %s for %s" % (lib_file, opsys))
-                    lib = Parsing.Library.Library(lib_file, opsys, ftype, self.backend)
-                    
-                    # if lib exists - flush functions
-                    # if lib exists and no-flush active - continue
-                    if (lib.existant == True and self.checkbox_flush.isChecked()) or lib.existant == False:
-                        lib.flush_me()
-                    
-                        if ftype == 'C':
-                            lib.parse_cfile()
-                        elif ftype == 'LST':
-                            lib.parse_lstfile()
-                        else:
-                            self.textbrowser_logging.append("Wrong file type! Either c or C or lst or LST, pleeease dont mix caps with small letters, dont have all day for op parsing ;)")
-                    
-                        self.textbrowser_logging.append("Finished Parsing")
+                    if os.path.isdir(path):
+                        os.system("start %s %s %s %s %s %s %s %s" % (cmd, diffray, '-d', path, '-t', ftype, '-o', opsys))
+                    elif os.path.exists(path):
+                        os.system("start %s %s %s %s %s %s %s %s" % (cmd, diffray, '-p', path, '-t', ftype, '-o', opsys))
                     else:
-                        self.textbrowser_logging.append("Nothing to parse here, continue.")
-    
+                        self.textbrowser_logging.append("Nothing to parse here. Maybe invalid path?")
+                except:
+                    self.textbrowser_logging.append("Something went wrong when parsing! Check if your input params are ok!")
+                 
+                else:
+                    self.textbrowser_logging.append("Finished Parsing %s" % path)
+                        
             except:
                 type, value, tb = sys.exc_info()
                 self.textbrowser_logging.append("Something went wrong when parsing a library: %s" % (value.message))

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1072</width>
-    <height>801</height>
+    <height>771</height>
    </rect>
   </property>
   <property name="palette">
@@ -940,6 +940,9 @@
        <height>51</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Starts IDB2C.exe to parse DLL to C</string>
+     </property>
      <property name="text">
       <string>GENERATE IT!</string>
      </property>
@@ -949,7 +952,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>190</y>
+      <y>160</y>
       <width>661</width>
       <height>261</height>
      </rect>
@@ -1412,6 +1415,9 @@
        <pointsize>10</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>Path to .C files</string>
+     </property>
      <property name="text">
       <string>CHOOSE PATH</string>
      </property>
@@ -1589,7 +1595,7 @@
       </font>
      </property>
      <property name="text">
-      <string>flush existing</string>
+      <string>flush if exists</string>
      </property>
     </widget>
     <widget class="QPushButton" name="button_parseit">
@@ -1619,6 +1625,9 @@
        <pointsize>10</pointsize>
       </font>
      </property>
+     <property name="toolTip">
+      <string>Path to a .C file</string>
+     </property>
      <property name="text">
       <string>CHOOSE FILE</string>
      </property>
@@ -1647,6 +1656,9 @@
        <height>31</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>Path to your 32bit python.exe</string>
+     </property>
      <property name="text">
       <string>PYTHON PATH</string>
      </property>
@@ -1656,7 +1668,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>470</y>
+      <y>440</y>
       <width>661</width>
       <height>171</height>
      </rect>
@@ -3317,7 +3329,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>670</y>
+      <y>640</y>
       <width>1031</width>
       <height>81</height>
      </rect>
@@ -3327,7 +3339,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>650</y>
+      <y>620</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -3340,7 +3352,7 @@
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>569</y>
+      <y>560</y>
       <width>341</width>
       <height>61</height>
      </rect>
