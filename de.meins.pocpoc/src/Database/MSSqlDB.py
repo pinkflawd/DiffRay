@@ -217,6 +217,7 @@ class MSSqlDB(object):
     def select_libs_byname(self, libname):
         select_string = "select id, libname, os, filetype from [Poc].[dbo].[t_library] where libname like '%%%s%%'" % libname
         return self.select(select_string)
+    
         
     # returns a set of hitcounts, grouped by funcname and sigpattern for whole lib
     def select_diff_one(self, libid):

@@ -60,6 +60,16 @@ class DiffRay_Main(QtGui.QMainWindow):
         self.connect(self.button_chf_parsing, QtCore.SIGNAL('clicked()'), self.showFileDialog)
         self.connect(self.button_chp_parsing, QtCore.SIGNAL('clicked()'), self.showDirDialog)
         self.connect(self.button_parseit, QtCore.SIGNAL('clicked()'), self.parseit)
+        
+        # INFO
+        
+        self.lineedit_searchlib = self.main_ui.lineedit_searchlib
+        self.button_searchlib = self.main_ui.button_searchlib
+        self.lineedit_allinfo = self.main_ui.lineedit_allinfo
+        self.button_allinfo = self.main_ui.button_allinfo
+        
+        self.connect(self.button_searchlib, QtCore.SIGNAL('clicked()'), self.searchlib_mbox)
+        self.connect(self.button_allinfo, QtCore.SIGNAL('clicked()'), self.allinfo_mbox)
 
         # CONFIG
         self.combobox_database = self.main_ui.combobox_database
@@ -85,6 +95,16 @@ class DiffRay_Main(QtGui.QMainWindow):
         self.textbrowser_logging.append("The commanline version is available by starting the Main.py")
         self.textbrowser_logging.append("For more information and a (short) manual check out the project home on https://github.com/pinkflawd/DiffRay")
         
+    def searchlib_mbox(self):
+        searchme = self.lineedit_searchlib.text().replace('\'','')
+        if (searchme != "" and self.backend != ""):
+            info = Diffing.Info.Info(self.backend)
+            info.search_libs(searchme)
+        else:
+            self.textbrowser_logging.append("Invalid lib search term or no connection to database!")
+    
+    def allinfo_mbox(self):
+        pass
                
     def showFileDialog(self):
         filename = QtGui.QFileDialog.getOpenFileName(self, 'Open file', 'C:\\')
