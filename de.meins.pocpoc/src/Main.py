@@ -4,14 +4,16 @@ Created on 05.09.2013
 @author: pinkflawd
 '''
 
-from optparse import OptionParser
-import Parsing.Library
-import Diffing.Info
-import sys
 import logging.config
-import re
+from optparse import OptionParser
 import os
+import re
+import sys
 import traceback
+
+import Diffing.Info
+import Parsing.Library
+
 
 def main():
     
@@ -165,7 +167,9 @@ def main():
         # sanitizing
         sanilibname = re.sub('\'','', options.libname,0)
         info = Diffing.Info.Info(database)
-        info.search_libs(sanilibname)
+        cursor = info.search_libs(sanilibname)
+        for item in cursor:
+            print "Library ID %s for %s with type %s and OS %s" % (item[0], item[1], item[3], item[2])
     
     ### OPTION lib_allinfo prints all hit information of one library, given the libid
     
@@ -176,7 +180,11 @@ def main():
             log.error("Libid has to be numeric!")
         else:
             info = Diffing.Info.Info(database)
-            info.library_info(libid)
+            cursor = info.library_info(libid)
+            
+            print "Libname;Functionname;Sigpattern;Line_Offset"
+            for item in cursor:
+                print "%s;%s;%s;%s" % (item[0],item[1],item[2],item[3]) 
     
     ### OPTION diff puts out csv content on the commandline or into a pipe, containing hitcounts of a win7 lib compared with a win8 lib ###
     
@@ -191,7 +199,8 @@ def main():
                 log.error("Libids have to be numeric!")
             else:
                 info = Diffing.Info.Info(database)
-                info.diff_libs(w7lib, w8lib)
+                output = info.diff_twosided(w7lib, w8lib)
+                print output
                 
         else:
             log.error("The Diff Option needs two valid library IDs, get them using the search_libs option, providing a library name!")
@@ -204,7 +213,8 @@ def main():
         ids = info.search_libs_diffing(sanilibname)
         if (ids != -1):
             #info.diff_libs(ids[0],ids[1])   # 0.. Win7, 1.. Win8
-            info.diff_twosided(ids[0],ids[1])
+            output = info.diff_twosided(ids[0],ids[1])
+            print output
         else:
             log.error("Something went wrong when choosing libs, maybe more than 2 matches or two libs with the same OS? Or different filetypes? Check with search_libs option!")
     

@@ -4,11 +4,11 @@ Created on 18.09.2013
 @author: pinkflawd
 '''
 
-import sqlite3
 import logging.config
 import os.path
-from Exceptions import DatabaseError
+import sqlite3
 
+from Exceptions import DatabaseError
 
 
 class SQLiteDB(object):

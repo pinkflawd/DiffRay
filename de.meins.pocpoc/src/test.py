@@ -6,8 +6,8 @@ Created on 13.10.2013
 
 from os import path
 import sys
-from PyQt4 import QtGui, QtCore
 
+from PyQt4 import QtGui, QtCore
 
 
 class MainWindow(QtGui.QMainWindow):

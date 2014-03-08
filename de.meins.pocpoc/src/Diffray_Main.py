@@ -4,20 +4,23 @@ Created on 01.02.2014
 @author: marschalek.m
 '''
 
-import sys, os
-from PyQt4 import QtGui, QtCore, uic
-import Gui.Settings
-
+import logging.config
 from optparse import OptionParser
-import Parsing.Library
-import Diffing.Info
+import os
+import re
+from subprocess import Popen, CREATE_NEW_CONSOLE
+import subprocess
+import sys
+import traceback
+
+from PyQt4 import QtGui, QtCore, uic
+
 import Database.MSSqlDB
 import Database.SQLiteDB
-import logging.config
-import re
-import traceback
-import subprocess
-from subprocess import Popen, CREATE_NEW_CONSOLE
+import Diffing.Info
+import Gui.Settings
+import Gui.InfoBox
+import Parsing.Library
 
 
 class DiffRay_Main(QtGui.QMainWindow):
@@ -33,14 +36,12 @@ class DiffRay_Main(QtGui.QMainWindow):
         # IDB2C
         
         self.button_generateit = self.main_ui.button_generateit
-        #self.button_idb2c = self.main_ui.button_idb2c
         self.lineedit_idb2c = self.main_ui.lineedit_idb2c
         self.lineedit_idb2c.setText(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'util', 'IDB2C.exe'))
         self.lineedit_idb2c.setReadOnly(1)
                 
         self.connect(self.button_generateit, QtCore.SIGNAL('clicked()'), self.generateit)    
-        #self.connect(self.button_idb2c, QtCore.SIGNAL('clicked()'), self.setIdb2cPath)    
-        
+         
         # PARSING
         self.lineedit_python = self.main_ui.lineedit_python
         self.lineedit_python.setText('C:\\Python27\\python.exe')
@@ -60,6 +61,18 @@ class DiffRay_Main(QtGui.QMainWindow):
         self.connect(self.button_chf_parsing, QtCore.SIGNAL('clicked()'), self.showFileDialog)
         self.connect(self.button_chp_parsing, QtCore.SIGNAL('clicked()'), self.showDirDialog)
         self.connect(self.button_parseit, QtCore.SIGNAL('clicked()'), self.parseit)
+        
+        # DIFFING
+        
+        self.lineedit_lib1 = self.main_ui.lineedit_lib1
+        self.lineedit_lib2 = self.main_ui.lineedit_lib2
+        self.button_diff_id = self.main_ui.button_diff_id
+        
+        self.lineedit_pattern = self.main_ui.lineedit_pattern
+        self.button_diff_name = self.main_ui.button_diff_name
+        
+        self.connect(self.button_diff_id, QtCore.SIGNAL('clicked()'), self.diff_id)
+        self.connect(self.button_diff_name, QtCore.SIGNAL('clicked()'), self.diff_name)
         
         # INFO
         
@@ -95,16 +108,42 @@ class DiffRay_Main(QtGui.QMainWindow):
         self.textbrowser_logging.append("The commanline version is available by starting the Main.py")
         self.textbrowser_logging.append("For more information and a (short) manual check out the project home on https://github.com/pinkflawd/DiffRay")
         
+        
+    ### SHOW INFO
+        
     def searchlib_mbox(self):
         searchme = self.lineedit_searchlib.text().replace('\'','')
         if (searchme != "" and self.backend != ""):
             info = Diffing.Info.Info(self.backend)
-            info.search_libs(searchme)
+            cursor = info.search_libs(searchme)
+            
+            libs = ""
+            for item in cursor:
+                name = item[1].replace('\\\\', '\\')
+                libs += "%s | %s | Type %s | OS %s\n" % (item[0], name, item[3], item[2])
+            
+            box = Gui.InfoBox.InfoBox()
+            box.textEdit_output.setText(libs)
+            box.exec_()
+            
         else:
             self.textbrowser_logging.append("Invalid lib search term or no connection to database!")
     
     def allinfo_mbox(self):
-        pass
+        libid = str(self.lineedit_allinfo.text())
+        if (libid.isdigit() and self.backend != ""):
+            info = Diffing.Info.Info(self.backend)
+            cursor = info.library_info(libid)
+            allinfo = "Libname;Functionname;Sigpattern;Line_Offset\n"  
+            for item in cursor:
+                allinfo += "%s;%s;%s;%s\n" % (item[0],item[1].replace('\\\\','\\'),item[2],item[3])
+
+            box = Gui.InfoBox.InfoBox()
+            box.textEdit_output.setText(allinfo)
+            box.exec_()
+            
+        else:
+            self.textbrowser_logging.append("Invalid lib ID or no connection to database!")    
                
     def showFileDialog(self):
         filename = QtGui.QFileDialog.getOpenFileName(self, 'Open file', 'C:\\')
@@ -126,6 +165,9 @@ class DiffRay_Main(QtGui.QMainWindow):
         dialog = Gui.Settings.Settings()
         dialog.setAcceptDrops(QtCore.Qt.WA_DeleteOnClose)
         dialog.exec_()
+        
+        
+    ### DATABASE STUFF    
         
     def connectdb(self):
         
@@ -179,6 +221,9 @@ class DiffRay_Main(QtGui.QMainWindow):
             self.textbrowser_logging.append("Signatures & mappings from signatures.conf/sig_mappings.conf inserted / updated")
         else:
             self.textbrowser_logging.append("Connect to a DB!")
+       
+    
+    ### ACTION
             
     def generateit(self):
         try:                        
@@ -218,7 +263,7 @@ class DiffRay_Main(QtGui.QMainWindow):
                     self.textbrowser_logging.append("Something went wrong when parsing! Check if your input params are ok!")
                  
                 else:
-                    self.textbrowser_logging.append("Finished Parsing %s" % path)
+                    self.textbrowser_logging.append("Parsing %s" % path)
                         
             except:
                 type, value, tb = sys.exc_info()
@@ -227,6 +272,43 @@ class DiffRay_Main(QtGui.QMainWindow):
                 self.textbrowser_logging.append("If MSSQL, are the access credentials right? Did you set the right permissions on the DB? Did you actually create a DB on mssql or sqlite?")
         else:
             self.textbrowser_logging.append("Connect to a DB! OR python path wrong.")
+            
+    def diff_id(self):
+        libid1 = str(self.lineedit_lib1.text())
+        libid2 = str(self.lineedit_lib2.text())
+        
+        if (libid1.isdigit() and libid2.isdigit() and self.backend != ""):
+            
+            info = Diffing.Info.Info(self.backend)
+            output = info.diff_twosided(libid1, libid2)
+            
+            box = Gui.InfoBox.InfoBox()
+            box.textEdit_output.setText(output)
+            box.exec_()
+        
+        else:
+            self.textbrowser_logging.append("LibIDs wrong or no DB connection available.")
+    
+    def diff_name(self):
+        sanilibname = str(self.lineedit_pattern.text().replace('\'', ''))
+        
+        if (sanilibname != "" and self.backend != ""):
+            info = Diffing.Info.Info(self.backend)
+            ids = info.search_libs_diffing(sanilibname)
+            if (ids != -1):
+                
+                #info.diff_libs(ids[0],ids[1])   # 0.. Win7, 1.. Win8
+                output = info.diff_twosided(ids[0],ids[1])
+                
+                box = Gui.InfoBox.InfoBox()
+                box.textEdit_output.setText(output)
+                box.exec_()
+            
+            else:
+                self.textbrowser_logging.append("Pattern doesn't match a Win7/Win8 library pair.")
+        
+        else:
+            self.textbrowser_logging.append("Libname pattern invalid or no DB connection available.")
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

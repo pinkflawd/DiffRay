@@ -4,12 +4,13 @@ Created on 05.09.2013
 @author: pinkflawd
 '''
 
-import Function
 import hashlib
-import re
 import logging.config
 import os
+import re
+
 from Exceptions import ParameterError, FileError
+import Function
 
 
 class Library(object):

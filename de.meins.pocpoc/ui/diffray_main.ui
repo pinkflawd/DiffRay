@@ -2102,29 +2102,6 @@
     <property name="flat">
      <bool>true</bool>
     </property>
-    <widget class="QPushButton" name="pushButton_12">
-     <property name="geometry">
-      <rect>
-       <x>500</x>
-       <y>90</y>
-       <width>81</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>DIFF IT!</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit_7">
-     <property name="geometry">
-      <rect>
-       <x>350</x>
-       <y>90</y>
-       <width>131</width>
-       <height>31</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="QGroupBox" name="groupBox_8">
      <property name="geometry">
       <rect>
@@ -2137,7 +2114,7 @@
      <property name="title">
       <string>BY ID</string>
      </property>
-     <widget class="QPushButton" name="pushButton_13">
+     <widget class="QPushButton" name="button_diff_id">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -2176,7 +2153,7 @@
        <string>Lib1</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_5">
+     <widget class="QLineEdit" name="lineedit_lib1">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -2186,7 +2163,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_6">
+     <widget class="QLineEdit" name="lineedit_lib2">
       <property name="geometry">
        <rect>
         <x>110</x>
@@ -2210,23 +2187,55 @@
       </property>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="groupBox_9">
+    <widget class="QGroupBox" name="groupBox_5">
      <property name="geometry">
       <rect>
-       <x>310</x>
+       <x>320</x>
        <y>30</y>
-       <width>301</width>
+       <width>291</width>
        <height>111</height>
       </rect>
      </property>
      <property name="title">
-      <string>BY NAME PATTERN</string>
+      <string>BY NAME</string>
      </property>
+     <widget class="QLineEdit" name="lineedit_pattern">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>60</y>
+        <width>113</width>
+        <height>31</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="button_diff_name">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>60</y>
+        <width>81</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>DIFF IT!</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>40</y>
+        <width>51</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Pattern</string>
+      </property>
+     </widget>
     </widget>
-    <zorder>groupBox_8</zorder>
-    <zorder>pushButton_12</zorder>
-    <zorder>lineEdit_7</zorder>
-    <zorder>groupBox_9</zorder>
    </widget>
    <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">

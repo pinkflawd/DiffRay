@@ -4,8 +4,9 @@ Created on 12.09.2013
 @author: pinkflawd
 '''
 
-from Exceptions import ParameterError
 import re
+
+from Exceptions import ParameterError
 
 
 class Function(object):

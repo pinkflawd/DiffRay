@@ -5,10 +5,12 @@ Created on 06.09.2013
 '''
 
 import ConfigParser
-import pymssql
-import os.path
-from Exceptions import DatabaseError, FileError
 import logging.config
+import os.path
+import pymssql
+
+from Exceptions import DatabaseError, FileError
+
 
 class MSSqlDB(object):
     

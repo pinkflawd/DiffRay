@@ -5,11 +5,12 @@ Created on 04.02.2014
 '''
 
 
-import sys, os
+import os
+import sys
+
 from PyQt4 import QtGui, QtCore, uic
 
 
- 
 class Settings(QtGui.QDialog):
 
     def __init__(self, parent=None):
