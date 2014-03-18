@@ -33,14 +33,21 @@ class DiffRay_Main(QtGui.QMainWindow):
         self.db = None
         self.backend = ""
         
-        # IDB2C
+        # C
         
-        self.button_generateit = self.main_ui.button_generateit
+        self.button_generateidb = self.main_ui.button_generateidb
+        self.button_generatec = self.main_ui.button_generatec
+        
         self.lineedit_idb2c = self.main_ui.lineedit_idb2c
         self.lineedit_idb2c.setText(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'util', 'IDB2C.exe'))
         self.lineedit_idb2c.setReadOnly(1)
+        
+        self.lineedit_asm2idb = self.main_ui.lineedit_asm2idb
+        self.lineedit_asm2idb.setText(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'util', 'ASM2IDB.exe'))
+        self.lineedit_asm2idb.setReadOnly(1)
                 
-        self.connect(self.button_generateit, QtCore.SIGNAL('clicked()'), self.generateit)    
+        self.connect(self.button_generateidb, QtCore.SIGNAL('clicked()'), self.generateidb)    
+        self.connect(self.button_generatec, QtCore.SIGNAL('clicked()'), self.generatec)    
          
         # PARSING
         self.lineedit_python = self.main_ui.lineedit_python
@@ -104,7 +111,7 @@ class DiffRay_Main(QtGui.QMainWindow):
         
         # LOGGING
         self.textbrowser_logging = self.main_ui.textbrowser_logging
-        self.textbrowser_logging.append("DiffRay GUI v0.9 started - initial SQLite DB created in the data directory (dbdbdb.sqlite)")
+        self.textbrowser_logging.append("DiffRay GUI v1.1 started - initial SQLite DB created in the data directory (dbdbdb.sqlite)")
         self.textbrowser_logging.append("The commanline version is available by starting the Main.py")
         self.textbrowser_logging.append("For more information and a (short) manual check out the project home on https://github.com/pinkflawd/DiffRay")
         
@@ -225,11 +232,17 @@ class DiffRay_Main(QtGui.QMainWindow):
     
     ### ACTION
             
-    def generateit(self):
+    def generateidb(self):
+        try:                        
+            os.system(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'util', 'ASM2IDB.exe'))
+        except:
+            self.textbrowser_logging.append("IDB2C.exe is not where it should be! - put it into the util dir")
+            
+    def generatec(self):
         try:                        
             os.system(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'util', 'IDB2C.exe'))
         except:
-            self.textbrowser_logging.append("IDB2C.exe is not where it should be! - put it into the util dir")
+            self.textbrowser_logging.append("ASM2IDB.exe is not where it should be! - put it into the util dir")    
 
     def parseit(self):
         

@@ -874,8 +874,8 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>30</y>
-       <width>621</width>
+       <y>70</y>
+       <width>521</width>
        <height>31</height>
       </rect>
      </property>
@@ -931,20 +931,97 @@
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QPushButton" name="button_generateit">
+    <widget class="QPushButton" name="button_generatec">
      <property name="geometry">
       <rect>
-       <x>510</x>
+       <x>550</x>
        <y>70</y>
-       <width>131</width>
-       <height>51</height>
+       <width>101</width>
+       <height>31</height>
       </rect>
      </property>
      <property name="toolTip">
       <string>Starts IDB2C.exe to parse DLL to C</string>
      </property>
      <property name="text">
-      <string>GENERATE IT!</string>
+      <string>GENERATE C!</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineedit_asm2idb">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>521</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="palette">
+      <palette>
+       <active>
+        <colorrole role="Base">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>215</red>
+           <green>237</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </active>
+       <inactive>
+        <colorrole role="Base">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>215</red>
+           <green>237</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </inactive>
+       <disabled>
+        <colorrole role="Base">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>164</red>
+           <green>224</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </disabled>
+      </palette>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <property name="frame">
+      <bool>false</bool>
+     </property>
+     <property name="readOnly">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="button_generateidb">
+     <property name="geometry">
+      <rect>
+       <x>550</x>
+       <y>30</y>
+       <width>101</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Starts IDB2C.exe to parse DLL to C</string>
+     </property>
+     <property name="text">
+      <string>GENERATE IDB!</string>
      </property>
     </widget>
    </widget>
@@ -1577,6 +1654,9 @@
       </property>
       <property name="text">
        <string>LST (deprecated)</string>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
       </property>
      </widget>
     </widget>
